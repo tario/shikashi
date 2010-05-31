@@ -31,6 +31,7 @@ module Shikashi
   class Sandbox
 
     attr_accessor :privileges
+    attr_reader :source
 
     def initialize
       @privileges = Shikashi::Privileges.new
@@ -66,6 +67,13 @@ module Shikashi
           return wrap.redirect_with_unhook(:call_with_rehook)
         end
 
+        if (method_name)
+          if recv.method(klass,method_id).body.file == sandbox.source
+            # allowed because the method are defined inside the sandbox
+            return nil
+          end
+        end
+
         unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
           raise SecurityError.new("Cannot invoke method #{method_name} over #{recv}")
         end
@@ -77,16 +85,17 @@ module Shikashi
     # Run the code in sandbox with the given privileges
     #
     def run(code , alternative_binding = nil)
-      source = Sandbox.generate_id
+      @source = Sandbox.generate_id
       handler = RallhookHandler.new
       handler.sandbox = self
       alternative_binding = alternative_binding || Shikashi.global_binding
       handler.hook do
-        eval(code, alternative_binding, source)
+        eval(code, alternative_binding, @source)
       end
     end
   end
 end
 
 Shikashi.global_binding = binding()
+
 
