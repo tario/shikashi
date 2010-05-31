@@ -5,13 +5,13 @@ require 'rake/rdoctask'
 require 'rake/gempackagetask'
 
 spec = Gem::Specification.new do |s|
-  s.name = 'caja'
+  s.name = 'shikashi'
   s.version = '0.0.0'
   s.author = 'Dario Seminara'
   s.email = 'robertodarioseminara@gmail.com'
   s.platform = Gem::Platform::RUBY
-  s.summary = 'caja is a ruby sandbox that permits the execution of "unprivileged" scripts by defining the permitted methods and constants the scripts can invoke (I.E., the script cannot use the File class or a RoR Model Class unless that permission is specified) "well done version" of ruby-arena-sanbox based on rallhook'
-  s.homepage = "http://github.com/tario/caja"
+  s.summary = 'shikashi is a ruby sandbox that permits the execution of "unprivileged" scripts by defining the permitted methods and constants the scripts can invoke (I.E., the script cannot use the File class or a RoR Model Class unless that permission is specified) "well done version" of ruby-arena-sanbox based on rallhook'
+  s.homepage = "http://github.com/tario/shikashi"
   s.add_dependency "rallhook", ">= 0.5.0"  
   s.has_rdoc = true
   s.extra_rdoc_files = [ 'README' ]
