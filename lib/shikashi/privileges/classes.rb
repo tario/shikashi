@@ -21,7 +21,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 module Shikashi
   class Privileges
     def allow_class_definitions
-      instances_of(Class).allow nil, :inherited
+      instances_of(Class).allow nil, :inherited, :method_added, :singleton_method_added
     end
   end
 end
