@@ -36,6 +36,7 @@ module Shikashi
       @privileges = Shikashi::Privileges.new
 
       @privileges.allow_method :eval
+      @privileges.allow_exceptions
     end
 
     def self.generate_id

@@ -50,8 +50,10 @@ class Privileges
        end
     end
 
-    def allow(mn)
+    def allow(*mns)
+      mns.each do |mn|
       @allowed_methods << mn
+      end
     end
 
     def allow_all
@@ -61,6 +63,8 @@ class Privileges
 
   def initialize
     @allowed_objects = Hash.new
+    @allowed_kinds = Hash.new
+    @allowed_classes = Hash.new
     @allowed_methods = Array.new
   end
 
@@ -72,6 +76,24 @@ class Privileges
     end
     tmp
   end
+
+  def kind_of(klass)
+    tmp = nil
+    unless @allowed_kinds[klass.__id__]
+      tmp = AllowedMethods.new
+      @allowed_kinds[klass.__id__] = tmp
+    end
+    tmp
+  end
+
+  def class_inherited_of(klass)
+    tmp = nil
+    unless @allowed_classes[klass.__id__]
+      tmp = AllowedMethods.new
+      @allowed_classes[klass.__id__] = tmp
+    end
+    tmp
+  end
   # allow the execution of method named method_name whereever
   def allow_method(method_name)
     @allowed_methods << method_name
@@ -79,16 +101,51 @@ class Privileges
 
   def allow?(klass, recv, method_name, method_id)
 
-    return true if @allowed_methods.include?(method_name)
+    begin
 
-    tmp = @allowed_objects[recv]
-    if tmp
-      if tmp.allow(method_name)
-        return true
+      return true if @allowed_methods.include?(method_name)
+
+      tmp = @allowed_objects[recv.__id__]
+      if tmp
+        if tmp.allowed?(method_name)
+          return true
+        end
       end
-    end
 
-    false
+      if recv.instance_of? Class
+        last_class = recv
+        while true
+          tmp = @allowed_classes[last_class.__id__]
+          if tmp
+            if tmp.allowed?(method_name)
+              return true
+            end
+          end
+          last_class = last_class.superclass
+          break if last_class == Object
+        end
+      end
+
+
+      last_class = recv.class
+      while true
+        tmp = @allowed_kinds[last_class.__id__]
+        if tmp
+          if tmp.allowed?(method_name)
+            return true
+          end
+        end
+        last_class = last_class.superclass
+        break if last_class == Object
+      end
+
+
+      false
+    rescue Exception => e
+#      print "ERROR: #{e}\n"
+ #     print e.backtrace.join("\n")
+      false
+    end
   end
 end
 
