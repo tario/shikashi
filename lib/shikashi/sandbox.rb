@@ -20,7 +20,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 =end
 
 require "rallhook"
-require "shikashi_privileges"
+require "shikashi/privileges"
 
 module Shikashi
 
