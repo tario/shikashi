@@ -20,7 +20,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 =end
 module Shikashi
   class Privileges
-    def allow_class_definition
+    def allow_class_definitions
       instances_of(Class).allow nil, :inherited
     end
   end
