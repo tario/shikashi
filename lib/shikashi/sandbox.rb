@@ -43,9 +43,29 @@ module Shikashi
       "sandbox-#{rand(1000000)}"
     end
 
+    class InheritedWrapper < RallHook::Helper::MethodWrapper
+      attr_accessor :sandbox
+      def call(subclass)
+        sandbox.privileges.object(subclass).allow :new
+        sandbox.privileges.instances_of(subclass).allow :initialize
+        original_call(subclass)
+      end
+    end
+
     class RallhookHandler < RallHook::HookHandler
       attr_accessor :sandbox
       def handle_method(klass, recv, method_name, method_id)
+
+        if method_name == :inherited and recv.instance_of? Class
+          wrap = InheritedWrapper.new
+          wrap.klass = klass
+          wrap.recv = recv
+          wrap.method_name = method_name
+          wrap.method_id = method_id
+          wrap.sandbox = sandbox
+          return wrap.redirect_with_unhook(:call_with_rehook)
+        end
+
         unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
           raise SecurityError.new("Cannot invoke method #{method_name} over #{recv}")
         end
