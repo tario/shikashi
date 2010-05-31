@@ -47,7 +47,7 @@ module Shikashi
       attr_accessor :sandbox
       def handle_method(klass, recv, method_name, method_id)
         unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
-          raise SecurityError.new("Cannot invoke method #{method_name}")
+          raise SecurityError.new("Cannot invoke method #{method_name} over #{recv}")
         end
         nil
       end

@@ -65,6 +65,7 @@ class Privileges
     @allowed_objects = Hash.new
     @allowed_kinds = Hash.new
     @allowed_classes = Hash.new
+    @allowed_instances = Hash.new
     @allowed_methods = Array.new
   end
 
@@ -94,6 +95,16 @@ class Privileges
     end
     tmp
   end
+
+  def instances_of(klass)
+    tmp = nil
+    unless @allowed_instances[klass.__id__]
+      tmp = AllowedMethods.new
+      @allowed_instances[klass.__id__] = tmp
+    end
+    tmp
+  end
+
   # allow the execution of method named method_name whereever
   def allow_method(method_name)
     @allowed_methods << method_name
@@ -102,7 +113,6 @@ class Privileges
   def allow?(klass, recv, method_name, method_id)
 
     begin
-
       return true if @allowed_methods.include?(method_name)
 
       tmp = @allowed_objects[recv.__id__]
@@ -121,11 +131,14 @@ class Privileges
               return true
             end
           end
-          last_class = last_class.superclass
-          break if last_class == Object
+          if last_class
+            last_class = last_class.superclass
+            break if last_class == Object
+          else
+            break
+          end
         end
       end
-
 
       last_class = recv.class
       while true
@@ -135,15 +148,25 @@ class Privileges
             return true
           end
         end
-        last_class = last_class.superclass
-        break if last_class == Object
+        if last_class
+          last_class = last_class.superclass
+          break if last_class == Object
+        else
+          break
+        end
       end
 
+      tmp = @allowed_instances[recv.class.__id__]
+      if tmp
+        if tmp.allowed?(method_name)
+          return true
+        end
+      end
 
       false
     rescue Exception => e
-#      print "ERROR: #{e}\n"
- #     print e.backtrace.join("\n")
+      print "ERROR: #{e}\n"
+     print e.backtrace.join("\n")
       false
     end
   end
