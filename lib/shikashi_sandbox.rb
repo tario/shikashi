@@ -20,6 +20,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 =end
 
 require "rallhook"
+require "shikashi_privileges"
 
 module Shikashi
 
@@ -29,6 +30,14 @@ module Shikashi
 
   class Sandbox
 
+    attr_accessor :privileges
+
+    def initialize
+      @privileges = Shikashi::Privileges.new
+
+      @privileges.allow_method :eval
+    end
+
     def self.generate_id
       "sandbox-#{rand(1000000)}"
     end
@@ -36,6 +45,9 @@ module Shikashi
     class RallhookHandler < RallHook::HookHandler
       attr_accessor :sandbox
       def handle_method(klass, recv, method_name, method_id)
+        unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
+          raise SecurityError.new("Cannot invoke method #{method_name}")
+        end
         nil
       end
     end
@@ -49,7 +61,7 @@ module Shikashi
       handler.sandbox = self
       alternative_binding = alternative_binding || Shikashi.global_binding
       handler.hook do
-        eval(code, Shikashi.global_binding, source)
+        eval(code, alternative_binding, source)
       end
     end
   end
