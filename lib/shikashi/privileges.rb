@@ -18,12 +18,23 @@ you should have received a copy of the gnu general public license
 along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
+require "find"
 
 module Shikashi
 #
 #The Privileges class represent permissions about methods and objects
 #
 class Privileges
+
+  def self.load_privilege_packages
+    Find.find(__FILE__.split("/")[0..-2].join("/") + "/privileges" ) do |path|
+      if path =~ /\.rb$/
+        require path
+      end
+    end
+  end
+
+  load_privilege_packages
 
   class AllowedMethods
     def initialize
