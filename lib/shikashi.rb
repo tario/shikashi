@@ -18,4 +18,6 @@ you should have received a copy of the gnu general public license
 along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
+require "shikashi_sandbox"
+
 
