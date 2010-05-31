@@ -165,8 +165,8 @@ class Privileges
 
       false
     rescue Exception => e
-      print "ERROR: #{e}\n"
-     print e.backtrace.join("\n")
+#      print "ERROR: #{e}\n"
+#    print e.backtrace.join("\n")
       false
     end
   end
