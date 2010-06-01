@@ -82,7 +82,6 @@ module Shikashi
     class InheritedWrapper < SandboxWrapper
       def call(subclass)
         sandbox.privileges.object(subclass).allow :new
-        sandbox.privileges.instances_of(subclass).allow :initialize
         original_call(subclass)
       end
     end
