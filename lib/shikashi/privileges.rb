@@ -19,6 +19,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
 require "find"
+require "shikashi/object_wrapper"
 
 module Shikashi
 #
@@ -110,22 +111,29 @@ class Privileges
     @allowed_methods << method_name
   end
 
-  def allow?(klass, recv, method_name, method_id)
+      def wrap(recv)
+        ObjectWrapper.new(recv)
+      end
+
+
+  def allow?(klass, recv_, method_name, method_id)
+
+    recv = wrap recv_
 
     begin
       return true if @allowed_methods.include?(method_name)
 
-      tmp = @allowed_objects[recv.__id__]
+      tmp = @allowed_objects[recv.object_id]
       if tmp
         if tmp.allowed?(method_name)
           return true
         end
       end
 
-      if recv.instance_of? Class
-        last_class = recv
+      if wrap(recv).instance_of? Class
+        last_class = wrap(recv)
         while true
-          tmp = @allowed_classes[last_class.__id__]
+          tmp = @allowed_classes[last_class.object_id]
           if tmp
             if tmp.allowed?(method_name)
               return true
@@ -142,7 +150,7 @@ class Privileges
 
       last_class = recv.class
       while true
-        tmp = @allowed_kinds[last_class.__id__]
+        tmp = @allowed_kinds[last_class.object_id]
         if tmp
           if tmp.allowed?(method_name)
             return true
@@ -156,7 +164,7 @@ class Privileges
         end
       end
 
-      tmp = @allowed_instances[recv.class.__id__]
+      tmp = @allowed_instances[recv.class.object_id]
       if tmp
         if tmp.allowed?(method_name)
           return true
@@ -173,3 +181,4 @@ class Privileges
 end
 
 end
+
