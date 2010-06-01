@@ -126,7 +126,13 @@ module Shikashi
       def handle_method(klass, recv, method_name, method_id)
 
         if (method_name)
-          if klass.instance_method(method_name).bind(recv).body.file == sandbox.source
+          sandbox_inside = true
+          begin
+            sandbox_inside = (klass.instance_method(method_name).bind(recv).body.file == sandbox.source)
+          rescue TypeError
+          end
+
+          if sandbox_inside
             # allowed because the method are defined inside the sandbox
             if sandbox.is_privileged
               # wrap method call
