@@ -31,6 +31,7 @@ module Shikashi
   class Sandbox
 
     attr_accessor :privileges
+    attr_accessor :current_privileges
     attr_reader :source
 
     def initialize
@@ -44,8 +45,21 @@ module Shikashi
       "sandbox-#{rand(1000000)}"
     end
 
-    class InheritedWrapper < RallHook::Helper::MethodWrapper
+
+    class SandboxWrapper < RallHook::Helper::MethodWrapper
       attr_accessor :sandbox
+      def self.redirect_handler(klass,recv,method_name,method_id,sandbox)
+          wrap = self.new
+          wrap.klass = klass
+          wrap.recv = recv
+          wrap.method_name = method_name
+          wrap.method_id = method_id
+          wrap.sandbox = sandbox
+          return wrap.redirect_with_unhook(:call_with_rehook)
+      end
+    end
+
+    class InheritedWrapper < SandboxWrapper
       def call(subclass)
         sandbox.privileges.object(subclass).allow :new
         sandbox.privileges.instances_of(subclass).allow :initialize
@@ -56,22 +70,20 @@ module Shikashi
     class RallhookHandler < RallHook::HookHandler
       attr_accessor :sandbox
       def handle_method(klass, recv, method_name, method_id)
-
-        if method_name == :inherited and recv.instance_of? Class
-          wrap = InheritedWrapper.new
-          wrap.klass = klass
-          wrap.recv = recv
-          wrap.method_name = method_name
-          wrap.method_id = method_id
-          wrap.sandbox = sandbox
-          return wrap.redirect_with_unhook(:call_with_rehook)
-        end
-
         if (method_name)
           if recv.method(klass,method_id).body.file == sandbox.source
             # allowed because the method are defined inside the sandbox
+            if sandbox.current_privileges != sandbox.privileges
+              # wrap method call
+            end
+
+            # continue with the method call
             return nil
           end
+        end
+
+        if method_name == :inherited and recv.instance_of? Class
+          return InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
         end
 
         unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
