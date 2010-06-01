@@ -22,8 +22,7 @@ module Shikashi
   class Privileges
     def allow_exceptions
       allow_method :raise
-      kind_of(Exception).allow :initialize, :backtrace, :set_backtrace, :exception
-      class_inherited_of(Exception).allow nil, :new
+      kind_of(Exception).allow :backtrace, :set_backtrace, :exception
     end
   end
 end
