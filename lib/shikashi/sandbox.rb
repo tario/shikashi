@@ -40,6 +40,7 @@ module Shikashi
 
       @privileges.allow_method :eval
       @privileges.allow_exceptions
+      @privileges.object(SecurityError).allow :new
     end
 
     def self.generate_id
