@@ -33,7 +33,14 @@ module Shikashi
 
     attr_accessor :privileges
     attr_accessor :is_privileged
-    attr_reader :source
+    attr_accessor :source
+    attr_accessor :eval_binding
+
+private
+    def generate_id
+      "sandbox-#{rand(1000000)}"
+    end
+public
 
     def initialize
       @privileges = Shikashi::Privileges.new
@@ -41,10 +48,9 @@ module Shikashi
       @privileges.allow_method :eval
       @privileges.allow_exceptions
       @privileges.object(SecurityError).allow :new
-    end
 
-    def self.generate_id
-      "sandbox-#{rand(1000000)}"
+      self.eval_binding = Shikashi.global_binding
+      self.source = generate_id
     end
 
     def privileged
@@ -164,12 +170,11 @@ module Shikashi
     #
     # Run the code in sandbox with the given privileges
     #
-    def run(code , alternative_binding = nil)
-      @source = Sandbox.generate_id
+    def run(code)
       handler = RallhookHandler.new
       handler.sandbox = self
       self.is_privileged = false
-      alternative_binding = alternative_binding || Shikashi.global_binding
+      alternative_binding = self.eval_binding
 
       RallHook::Hook.from(0)
       handler.hook do
