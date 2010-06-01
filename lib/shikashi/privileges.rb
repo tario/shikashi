@@ -68,6 +68,7 @@ class Privileges
     @allowed_classes = Hash.new
     @allowed_instances = Hash.new
     @allowed_methods = Array.new
+    @allowed_klass_methods = Hash.new
   end
 
   def object(obj)
@@ -100,6 +101,10 @@ class Privileges
     hash_entry(@allowed_instances, klass.object_id)
   end
 
+  def methods_of(klass)
+    hash_entry(@allowed_klass_methods, klass.object_id)
+  end
+
   # allow the execution of method named method_name whereever
   def allow_method(method_name)
     @allowed_methods << method_name
@@ -118,6 +123,13 @@ class Privileges
       return true if @allowed_methods.include?(method_name)
 
       tmp = @allowed_objects[recv.object_id]
+      if tmp
+        if tmp.allowed?(method_name)
+          return true
+        end
+      end
+
+      tmp = @allowed_klass_methods[klass.object_id]
       if tmp
         if tmp.allowed?(method_name)
           return true
