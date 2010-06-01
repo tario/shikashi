@@ -46,11 +46,23 @@ module Shikashi
     end
 
     def privileged
-      yield
+      old_is_privileged = is_privileged
+      begin
+        self.is_privileged = true
+        yield
+      ensure
+        self.is_privileged = old_is_privileged
+      end
     end
 
     def unprivileged
-      yield
+      old_is_privileged = is_privileged
+      begin
+        self.is_privileged = false
+        yield
+      ensure
+        self.is_privileged = old_is_privileged
+      end
     end
 
 
@@ -80,9 +92,7 @@ module Shikashi
         sandbox.privileged do
           if block_given?
             original_call(*args) do |*x|
-              sandbox.unprivileged do
-                yield(*x)
-              end
+              yield(*x)
             end
           else
             original_call(*args)
@@ -96,9 +106,7 @@ module Shikashi
         sandbox.unprivileged do
           if block_given?
             original_call(*args) do |*x|
-              sandbox.privileged do
-                yield(*x)
-              end
+              yield(*x)
             end
           else
             original_call(*args)
@@ -110,6 +118,7 @@ module Shikashi
     class RallhookHandler < RallHook::HookHandler
       attr_accessor :sandbox
       def handle_method(klass, recv, method_name, method_id)
+
         if (method_name)
           if recv.method(klass,method_id).body.file == sandbox.source
             # allowed because the method are defined inside the sandbox
@@ -128,12 +137,13 @@ module Shikashi
         end
 
         unless sandbox.is_privileged
-          print "check #{method_name}\n"
           unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
             raise SecurityError.new("Cannot invoke method #{method_name} over #{recv}")
           end
 
+          if method_name != :eval
           return PrivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+          end
         end
 
         nil
@@ -147,8 +157,9 @@ module Shikashi
       @source = Sandbox.generate_id
       handler = RallhookHandler.new
       handler.sandbox = self
-      is_privileged = false
+      self.is_privileged = false
       alternative_binding = alternative_binding || Shikashi.global_binding
+
       handler.hook do
         eval(code, alternative_binding, @source)
       end
