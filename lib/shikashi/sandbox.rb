@@ -31,7 +31,7 @@ module Shikashi
   class Sandbox
 
     attr_accessor :privileges
-    attr_accessor :current_privileges
+    attr_accessor :is_privileged
     attr_reader :source
 
     def initialize
@@ -43,6 +43,14 @@ module Shikashi
 
     def self.generate_id
       "sandbox-#{rand(1000000)}"
+    end
+
+    def privileged
+      yield
+    end
+
+    def unprivileged
+      yield
     end
 
 
@@ -67,14 +75,47 @@ module Shikashi
       end
     end
 
+    class PrivilegedMethodWrapper < SandboxWrapper
+      def call(*args)
+        sandbox.privileged do
+          if block_given?
+            original_call(*args) do |*x|
+              sandbox.unprivileged do
+                yield(*x)
+              end
+            end
+          else
+            original_call(*args)
+          end
+        end
+      end
+    end
+
+    class UnprivilegedMethodWrapper < SandboxWrapper
+      def call(*args)
+        sandbox.unprivileged do
+          if block_given?
+            original_call(*args) do |*x|
+              sandbox.privileged do
+                yield(*x)
+              end
+            end
+          else
+            original_call(*args)
+          end
+        end
+      end
+    end
+
     class RallhookHandler < RallHook::HookHandler
       attr_accessor :sandbox
       def handle_method(klass, recv, method_name, method_id)
         if (method_name)
           if recv.method(klass,method_id).body.file == sandbox.source
             # allowed because the method are defined inside the sandbox
-            if sandbox.current_privileges != sandbox.privileges
+            if sandbox.is_privileged
               # wrap method call
+              return UnprivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
             end
 
             # continue with the method call
@@ -86,9 +127,15 @@ module Shikashi
           return InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
         end
 
-        unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
-          raise SecurityError.new("Cannot invoke method #{method_name} over #{recv}")
+        unless sandbox.is_privileged
+          print "check #{method_name}\n"
+          unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
+            raise SecurityError.new("Cannot invoke method #{method_name} over #{recv}")
+          end
+
+          return PrivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
         end
+
         nil
       end
     end
@@ -100,6 +147,7 @@ module Shikashi
       @source = Sandbox.generate_id
       handler = RallhookHandler.new
       handler.sandbox = self
+      is_privileged = false
       alternative_binding = alternative_binding || Shikashi.global_binding
       handler.hook do
         eval(code, alternative_binding, @source)
