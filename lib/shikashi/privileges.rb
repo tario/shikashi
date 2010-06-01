@@ -118,6 +118,7 @@ class Privileges
   def allow?(klass, recv_, method_name, method_id)
 
     recv = wrap(recv_)
+    m = recv_.method(method_name)
 
     begin
       return true if @allowed_methods.include?(method_name)
@@ -129,7 +130,7 @@ class Privileges
         end
       end
 
-      tmp = @allowed_klass_methods[klass.object_id]
+      tmp = @allowed_klass_methods[m.owner.object_id]
       if tmp
         if tmp.allowed?(method_name)
           return true
