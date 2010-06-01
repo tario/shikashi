@@ -132,6 +132,8 @@ module Shikashi
         end
 
         if method_name == :inherited and recv.instance_of? Class
+
+
           return InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
         end
 
@@ -140,9 +142,7 @@ module Shikashi
             raise SecurityError.new("Cannot invoke method #{method_name} over #{recv}")
           end
 
-          if method_name != :eval
           return PrivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-          end
         end
 
         nil
@@ -159,6 +159,7 @@ module Shikashi
       self.is_privileged = false
       alternative_binding = alternative_binding || Shikashi.global_binding
 
+      RallHook::Hook.from(0)
       handler.hook do
         eval(code, alternative_binding, @source)
       end
