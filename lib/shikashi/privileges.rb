@@ -119,7 +119,7 @@ class Privileges
 
     recv = wrap(recv_)
     m = nil
-    m = recv_.method(method_name) if method_name
+    m = recv.method(method_name) if method_name
 
     begin
       return true if @allowed_methods.include?(method_name)
