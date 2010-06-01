@@ -118,7 +118,7 @@ class Privileges
 
   def allow?(klass, recv_, method_name, method_id)
 
-    recv = wrap recv_
+    recv = wrap(recv_)
 
     begin
       return true if @allowed_methods.include?(method_name)
@@ -130,8 +130,9 @@ class Privileges
         end
       end
 
-      if wrap(recv).instance_of? Class
-        last_class = wrap(recv)
+      if recv.instance_of? Class
+        last_class = recv
+
         while true
           tmp = @allowed_classes[last_class.object_id]
           if tmp
@@ -140,8 +141,8 @@ class Privileges
             end
           end
           if last_class
-            last_class = last_class.superclass
             break if last_class == Object
+            last_class = last_class.superclass
           else
             break
           end
@@ -157,8 +158,8 @@ class Privileges
           end
         end
         if last_class
-          last_class = last_class.superclass
           break if last_class == Object
+          last_class = last_class.superclass
         else
           break
         end
@@ -173,8 +174,8 @@ class Privileges
 
       false
     rescue Exception => e
-#      print "ERROR: #{e}\n"
-#    print e.backtrace.join("\n")
+      print "ERROR: #{e}\n"
+    print e.backtrace.join("\n")
       false
     end
   end

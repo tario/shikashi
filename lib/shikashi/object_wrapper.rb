@@ -62,5 +62,8 @@ module Shikashi
       Object.instance_method(m).bind(@obj).call(*args)
     end
 
+    def superclass(*args)
+      Class.instance_method(:superclass).bind(@obj).call(*args)
+    end
   end
 end
