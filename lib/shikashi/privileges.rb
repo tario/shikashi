@@ -83,14 +83,12 @@ private
   end
 public
 
-  def kind_of(klass)
-    hash_entry(@allowed_kinds, klass.object_id)
-  end
-
-  def class_inherited_of(klass)
-    hash_entry(@allowed_classes, klass.object_id)
-  end
-
+#
+#Specifies the methods allowed for an specific object
+#
+#Example 1:
+# privileges.object(Hash).allow :new
+#
 
   def object(obj)
     hash_entry(@allowed_objects, obj.object_id)
