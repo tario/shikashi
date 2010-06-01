@@ -79,31 +79,25 @@ class Privileges
     tmp
   end
 
-  def kind_of(klass)
-    tmp = nil
-    unless @allowed_kinds[klass.__id__]
+  def hash_entry(hash, key)
+    tmp = hash[key]
+    unless tmp
       tmp = AllowedMethods.new
-      @allowed_kinds[klass.__id__] = tmp
+      hash[key] = tmp
     end
     tmp
+  end
+
+  def kind_of(klass)
+    hash_entry(@allowed_kinds, klass.object_id)
   end
 
   def class_inherited_of(klass)
-    tmp = nil
-    unless @allowed_classes[klass.__id__]
-      tmp = AllowedMethods.new
-      @allowed_classes[klass.__id__] = tmp
-    end
-    tmp
+    hash_entry(@allowed_classes, klass.object_id)
   end
 
   def instances_of(klass)
-    tmp = nil
-    unless @allowed_instances[klass.__id__]
-      tmp = AllowedMethods.new
-      @allowed_instances[klass.__id__] = tmp
-    end
-    tmp
+    hash_entry(@allowed_instances, klass.object_id)
   end
 
   # allow the execution of method named method_name whereever
