@@ -20,6 +20,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 =end
 module Shikashi
   class Privileges
+    #Defines the permissions needed to declare classes within the sandbox
     def allow_class_definitions
       instances_of(Class).allow nil, :inherited, :method_added
     end

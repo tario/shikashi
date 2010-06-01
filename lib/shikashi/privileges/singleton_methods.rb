@@ -20,6 +20,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 =end
 module Shikashi
   class Privileges
+    #Define the permissions needed to define singleton methods within the sandbox
     def allow_singleton_methods
       allow_method :singleton_method_added
     end

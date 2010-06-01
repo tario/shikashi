@@ -20,6 +20,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 =end
 module Shikashi
   class Privileges
+    #Define the permissions needed to raise exceptions within the sandbox
     def allow_exceptions
       allow_method :raise
       methods_of(Exception).allow :backtrace, :set_backtrace, :exception
