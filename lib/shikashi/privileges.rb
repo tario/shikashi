@@ -27,6 +27,7 @@ module Shikashi
 #
 class Privileges
 
+private
   def self.load_privilege_packages
     Find.find(__FILE__.split("/")[0..-2].join("/") + "/privileges" ) do |path|
       if path =~ /\.rb$/
@@ -36,7 +37,7 @@ class Privileges
   end
 
   load_privilege_packages
-
+public
   class AllowedMethods
     def initialize
       @allowed_methods = Array.new
@@ -71,15 +72,7 @@ class Privileges
     @allowed_klass_methods = Hash.new
   end
 
-  def object(obj)
-    tmp = nil
-    unless @allowed_objects[obj.__id__]
-      tmp = AllowedMethods.new
-      @allowed_objects[obj.__id__] = tmp
-    end
-    tmp
-  end
-
+private
   def hash_entry(hash, key)
     tmp = hash[key]
     unless tmp
@@ -88,6 +81,7 @@ class Privileges
     end
     tmp
   end
+public
 
   def kind_of(klass)
     hash_entry(@allowed_kinds, klass.object_id)
@@ -97,27 +91,65 @@ class Privileges
     hash_entry(@allowed_classes, klass.object_id)
   end
 
+
+  def object(obj)
+    hash_entry(@allowed_objects, obj.object_id)
+  end
+
+#
+#Specifies the methods allowed for the instances of a class
+#
+#Example 1:
+# privileges.instances_of(Array).allow :each # allow calls of methods named "each" over instances of Array
+#
+#Example 2:
+# privileges.instances_of(Array).allow :select, map # allow calls of methods named "each" and "map" over instances of Array
+#
+#Example 3:
+# privileges.instances_of(Hash).allow_all # allow any method call over instances of Hash
+#
   def instances_of(klass)
     hash_entry(@allowed_instances, klass.object_id)
   end
 
+#
+#Specifies the methods allowed for an implementation in specific class
+#
+#Example 1:
+# privileges.methods_of(X).allow :foo
+#
+# ...
+# class X
+#   def foo # allowed :)
+#   end
+# end
+#
+# class Y < X
+#   def foo # disallowed
+#   end
+# end
+#
+# X.new.foo # allowed
+# Y.new.foo # disallowed: SecurityError
+# ...
+#
   def methods_of(klass)
     hash_entry(@allowed_klass_methods, klass.object_id)
   end
 
-  # allow the execution of method named method_name whereever
+#allow the execution of method named method_name whereever
+#
+#Example:
+# privileges.allow_method(:foo)
+#
+
   def allow_method(method_name)
     @allowed_methods << method_name
   end
 
-      def wrap(recv)
-        ObjectWrapper.new(recv)
-      end
-
-
   def allow?(klass, recv_, method_name, method_id)
 
-    recv = wrap(recv_)
+    recv = ObjectWrapper.new(recv_)
     m = nil
     m = recv.method(method_name) if method_name
 
