@@ -170,7 +170,7 @@ public
 
         unless sandbox.is_privileged
           unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
-            raise SecurityError.new("Cannot invoke method #{method_name} over object of class #{klass}")
+            raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
           end
 
           return PrivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
