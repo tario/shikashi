@@ -172,7 +172,7 @@ public
 
     recv = ObjectWrapper.new(recv_)
     m = nil
-    m = recv.method(method_name) if method_name
+    m = klass.instance_method(method_name) if method_name
 
     begin
       return true if @allowed_methods.include?(method_name)
