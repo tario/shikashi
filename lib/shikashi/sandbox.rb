@@ -64,6 +64,7 @@ public
       self.source = generate_id
     end
 
+    # Used internally, switch to privileged state in a block and returns to previous state
     def privileged
       old_is_privileged = @is_privileged
       begin
@@ -74,6 +75,7 @@ public
       end
     end
 
+    # Used internally, switch to unprivileged state in a block and returns to previous state
     def unprivileged
       old_is_privileged = @is_privileged
       begin
@@ -179,7 +181,13 @@ public
     end
 
     #
-    # Run the code in sandbox with the given privileges
+    #Run the code in sandbox with the given privileges
+    #
+    #Example:
+    #
+    # sandbox = Sandbox.new
+    # sandbox.privileges.allow_method :print
+    # sandbox.run('print "hello world\n"')
     #
     def run(code)
       handler = RallhookHandler.new
