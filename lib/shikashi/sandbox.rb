@@ -113,7 +113,7 @@ public
         sandbox.privileged do
           if block_given?
             original_call(*args) do |*x|
-              yield(*x)
+              sandbox.unprivileged do yield(*x) end
             end
           else
             original_call(*args)
@@ -127,7 +127,7 @@ public
         sandbox.unprivileged do
           if block_given?
             original_call(*args) do |*x|
-              yield(*x)
+              sandbox.privileged do yield(*x) end
             end
           else
             original_call(*args)
