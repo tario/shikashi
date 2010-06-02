@@ -31,9 +31,20 @@ module Shikashi
 
   class Sandbox
 
+#privileges of restricted code within sandbox
+#
+#Example
+# sandbox.privileges.allow_method :raise
+#
     attr_accessor :privileges
+#the privileged status of the sandbox, attribute used internally
+#is_privileged = true means that any method call can be executed
+#is_privileged = false means that only the calls allowed by the specified privileges can be execute
+#
     attr_accessor :is_privileged
+#String containing the source name of the code inside the sandbox, the default is randomly generated
     attr_accessor :source
+#Binding of execution, the default is a binding in a global context allowing the definition of module of classes
     attr_accessor :eval_binding
 
 private
