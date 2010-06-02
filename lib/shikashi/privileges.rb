@@ -38,26 +38,49 @@ private
 
   load_privilege_packages
 public
+
+  # Used in Privileges to store information about specified method permissions
   class AllowedMethods
     def initialize
       @allowed_methods = Array.new
       @all = false
     end
 
-    def allowed?(mn)
+    #return true if the method named method_name is allowed
+    #Example
+    #
+    # allowed_methods = AllowedMethods.new
+    # allowed_methods.allowed? :foo # => false
+    # allowed_methods.allow :foo
+    # allowed_methods.allowed? :foo # => true
+    # allowed_methods.allow_all
+    # allowed_methods.allowed? :bar # => true
+    #
+    # Privileges#instance_of, Privileges#methods_of and Privileges#object returns the corresponding
+    # instance of AllowedMethods
+    def allowed?(method_name)
        if @all
          true
        else
-         @allowed_methods.include?(mn)
+         @allowed_methods.include?(method_name)
        end
     end
 
-    def allow(*mns)
-      mns.each do |mn|
+    #Specifies that a method or list of methods are allowed
+    #Example
+    #
+    # allowed_methods = AllowedMethods.new
+    # allowed_methods.allow :foo
+    # allowed_methods.allow :foo, :bar
+    # allowed_methods.allow :foo, :bar, :test
+    #
+    def allow(*method_names)
+      method_names.each do |mn|
       @allowed_methods << mn
       end
     end
 
+    #Specifies that any method is allowed
     def allow_all
       @all = true
     end
@@ -105,7 +128,7 @@ public
 #
 #Example 3:
 # privileges.instances_of(Hash).allow_all # allow any method call over instances of Hash
-#
+
   def instances_of(klass)
     hash_entry(@allowed_instances, klass.object_id)
   end
