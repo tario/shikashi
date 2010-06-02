@@ -41,7 +41,7 @@ module Shikashi
 #is_privileged = true means that any method call can be executed
 #is_privileged = false means that only the calls allowed by the specified privileges can be execute
 #
-    attr_accessor :is_privileged
+    attr_reader :is_privileged
 #String containing the source name of the code inside the sandbox, the default is randomly generated
     attr_accessor :source
 #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
@@ -65,22 +65,22 @@ public
     end
 
     def privileged
-      old_is_privileged = is_privileged
+      old_is_privileged = @is_privileged
       begin
-        self.is_privileged = true
+        @is_privileged = true
         yield
       ensure
-        self.is_privileged = old_is_privileged
+        @is_privileged = old_is_privileged
       end
     end
 
     def unprivileged
-      old_is_privileged = is_privileged
+      old_is_privileged = @is_privileged
       begin
-        self.is_privileged = false
+        @is_privileged = false
         yield
       ensure
-        self.is_privileged = old_is_privileged
+        @is_privileged = old_is_privileged
       end
     end
 
@@ -184,7 +184,7 @@ public
     def run(code)
       handler = RallhookHandler.new
       handler.sandbox = self
-      self.is_privileged = false
+      @is_privileged = false
       alternative_binding = self.eval_binding
 
       RallHook::Hook.from(0)
