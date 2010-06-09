@@ -56,7 +56,6 @@ public
     def initialize
       @privileges = Shikashi::Privileges.new
 
-      @privileges.allow_method :eval
       @privileges.allow_exceptions
       @privileges.object(SecurityError).allow :new
 
@@ -145,6 +144,8 @@ public
 
       def handle_method(klass, recv, method_name, method_id)
 
+        return nil if (method_name == :eval)
+
         if (method_name)
           sandbox_inside = true
           begin
@@ -195,7 +196,6 @@ public
       @is_privileged = false
       alternative_binding = self.eval_binding
 
-      RallHook::Hook.from(0)
       handler.hook do
         eval(code, alternative_binding, @source)
       end
