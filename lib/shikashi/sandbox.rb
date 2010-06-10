@@ -95,6 +95,20 @@ public
 
     class SandboxWrapper < RallHook::Helper::MethodWrapper
       attr_accessor :sandbox
+      def objwrap(recv)
+        ObjectWrapper.new(recv)
+      end
+
+      def inherited_check(args)
+        if method_name == :inherited then
+          if objwrap(recv).instance_of? Class then
+            subclass = args.first
+            sandbox.privileges.object(subclass).allow :new
+            sandbox.privileges.instances_of(subclass).allow :initialize
+          end
+        end
+      end
+
       def self.redirect_handler(klass,recv,method_name,method_id,sandbox)
           wrap = self.new
           wrap.klass = klass
@@ -107,15 +121,18 @@ public
     end
 
     class InheritedWrapper < SandboxWrapper
-      def call(subclass)
+      def call(*args)
+        subclass = args.first
         sandbox.privileges.object(subclass).allow :new
         sandbox.privileges.instances_of(subclass).allow :initialize
-        original_call(subclass)
+        original_call(*args)
       end
     end
 
     class PrivilegedMethodWrapper < SandboxWrapper
       def call(*args)
+        inherited_check(args)
+
         sandbox.privileged do
           if block_given?
             original_call(*args) do |*x|
@@ -130,6 +147,8 @@ public
 
     class UnprivilegedMethodWrapper < SandboxWrapper
       def call(*args)
+        inherited_check(args)
+
         sandbox.unprivileged do
           if block_given?
             original_call(*args) do |*x|
@@ -167,13 +186,12 @@ public
               return UnprivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
             end
 
+            if method_name == :inherited and wrap(recv).instance_of? Class
+              return InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+            end
             # continue with the method call
             return nil
           end
-        end
-
-        if method_name == :inherited and wrap(recv).instance_of? Class
-          return InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
         end
 
         unless sandbox.is_privileged
@@ -182,6 +200,10 @@ public
           end
 
           return PrivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+        end
+
+        if method_name == :inherited and wrap(recv).instance_of? Class
+          return InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
         end
 
         nil
