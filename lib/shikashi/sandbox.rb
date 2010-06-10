@@ -63,6 +63,13 @@ public
       self.source = generate_id
     end
 
+    def privileges= (priv)
+      priv.allow_exceptions
+      priv.object(SecurityError).allow :new
+      @privileges = priv
+      priv
+    end
+
     # Used internally, switch to privileged state in a block and returns to previous state
     def privileged
       old_is_privileged = @is_privileged
