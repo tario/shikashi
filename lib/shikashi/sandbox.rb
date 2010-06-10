@@ -173,11 +173,7 @@ public
         return nil if (method_name == :eval)
 
         if (method_name)
-          sandbox_inside = true
-          begin
-            sandbox_inside = (klass.instance_method(method_name).bind(recv).body.file == sandbox.source)
-          rescue TypeError
-          end
+          sandbox_inside = (klass.instance_method(method_name).body.file == sandbox.source)
 
           if sandbox_inside
             # allowed because the method are defined inside the sandbox
