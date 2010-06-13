@@ -173,7 +173,7 @@ public
         return nil if (method_name == :eval)
 
         if (method_name)
-          sandbox_inside = (klass.instance_method(method_name).body.file == sandbox.source)
+          sandbox_inside = (klass.shadow.instance_method(method_name).body.file == sandbox.source)
 
           if sandbox_inside
             # allowed because the method are defined inside the sandbox
