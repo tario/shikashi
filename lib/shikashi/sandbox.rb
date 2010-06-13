@@ -215,7 +215,7 @@ public
     # sandbox.privileges.allow_method :print
     # sandbox.run('print "hello world\n"')
     #
-    def run(code)
+    def run(code = "")
       handler = RallhookHandler.new
       handler.sandbox = self
       @is_privileged = false
