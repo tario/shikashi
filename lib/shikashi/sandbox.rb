@@ -221,8 +221,14 @@ public
       @is_privileged = false
       alternative_binding = self.eval_binding
 
-      handler.hook do
-        eval(code, alternative_binding, @source)
+      if block_given?
+        handler.hook do
+            yield
+        end
+      else
+        handler.hook do
+          eval(code, alternative_binding, @source)
+        end
       end
     end
   end
