@@ -29,6 +29,22 @@ module Shikashi
     attr_accessor :global_binding
   end
 
+
+#The sandbox class run the sandbox, because of internal behaviour only can be use one instance
+#of sandbox by thread (each different thread may have its own sandbox running in the same time)
+#
+#Example:
+#
+# require "shikashi"
+#
+# include Shikashi
+#
+# s = Sandbox.new
+# priv = Privileges.new
+# priv.allow_method :print
+#
+# s.run(priv, 'print "hello world\n"')
+#
   class Sandbox
 
 #array of privileges of restricted code within sandbox
