@@ -39,7 +39,8 @@ module Shikashi
     attr_reader :privileges
 #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
     attr_accessor :eval_binding
-    attr_accessor :chain
+#Hash with the chains of sources
+    attr_reader :chain
 
 #
 # Generate a random source file name for the sandbox, used internally
@@ -55,6 +56,7 @@ module Shikashi
       self.eval_binding = Shikashi.global_binding
     end
 
+# add a chain of sources, used internally
     def add_source_chain(outer, inner)
       @chain[inner] = outer
     end
