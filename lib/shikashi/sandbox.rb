@@ -102,8 +102,6 @@ public
       end
 
       def handle_method(klass, recv, method_name, method_id)
-        return nil if (method_name == :eval)
-	
 	if method_name
 
           source = caller.first.split(":").first
