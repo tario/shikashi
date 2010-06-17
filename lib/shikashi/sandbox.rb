@@ -77,8 +77,15 @@ module Shikashi
       @chain[inner] = outer
     end
 
-    class SandboxWrapper < RallHook::Helper::MethodWrapper
+
+#Base class to define redirections of methods called in the sandbox
+#
+#Example:
+#
+    class MethodWrapper < RallHook::Helper::MethodWrapper
       attr_accessor :sandbox
+      attr_accessor :privileges
+      attr_accessor :source
       def objwrap(recv)
         ObjectWrapper.new(recv)
       end
@@ -109,11 +116,7 @@ module Shikashi
       end
     end
 
-    class MethodWrapper < SandboxWrapper
-      attr_accessor :privileges
-      attr_accessor :source
-    end
-
+    # Used internally
     class InheritedWrapper < MethodWrapper
       def call(*args)
         subclass = args.first
@@ -123,7 +126,8 @@ module Shikashi
       end
     end
 
-    class DummyWrapper < SandboxWrapper
+    # Used internally
+    class DummyWrapper < MethodWrapper
       def call(*args)
         if block_given?
           original_call(*args) do |*x|
