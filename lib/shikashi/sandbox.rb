@@ -31,19 +31,12 @@ module Shikashi
 
   class Sandbox
 
-#privileges of restricted code within sandbox
+#array of privileges of restricted code within sandbox
 #
 #Example
-# sandbox.privileges.allow_method :raise
+# sandbox.privileges[source].allow_method :raise
 #
-    attr_accessor :privileges
-#the privileged status of the sandbox, attribute used internally
-#is_privileged = true means that any method call can be executed
-#is_privileged = false means that only the calls allowed by the specified privileges can be execute
-#
-    attr_reader :is_privileged
-#String containing the source name of the code inside the sandbox, the default is randomly generated
-    attr_accessor :source
+    attr_reader :privileges
 #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
     attr_accessor :eval_binding
 
@@ -54,44 +47,9 @@ private
 public
 
     def initialize
-      @privileges = Shikashi::Privileges.new
-
-      @privileges.allow_exceptions
-      @privileges.object(SecurityError).allow :new
-
+      @privileges = Hash.new
       self.eval_binding = Shikashi.global_binding
-      self.source = generate_id
     end
-
-    def privileges= (priv)
-      priv.allow_exceptions
-      priv.object(SecurityError).allow :new
-      @privileges = priv
-      priv
-    end
-
-    # Used internally, switch to privileged state in a block and returns to previous state
-    def privileged
-      old_is_privileged = @is_privileged
-      begin
-        @is_privileged = true
-        yield
-      ensure
-        @is_privileged = old_is_privileged
-      end
-    end
-
-    # Used internally, switch to unprivileged state in a block and returns to previous state
-    def unprivileged
-      old_is_privileged = @is_privileged
-      begin
-        @is_privileged = false
-        yield
-      ensure
-        @is_privileged = old_is_privileged
-      end
-    end
-
 
     class SandboxWrapper < RallHook::Helper::MethodWrapper
       attr_accessor :sandbox
@@ -121,43 +79,12 @@ public
     end
 
     class InheritedWrapper < SandboxWrapper
+      attr_accessor :privileges
       def call(*args)
         subclass = args.first
-        sandbox.privileges.object(subclass).allow :new
-        sandbox.privileges.instances_of(subclass).allow :initialize
+        privileges.object(subclass).allow :new
+        privileges.instances_of(subclass).allow :initialize
         original_call(*args)
-      end
-    end
-
-    class PrivilegedMethodWrapper < SandboxWrapper
-      def call(*args)
-        inherited_check(args)
-
-        sandbox.privileged do
-          if block_given?
-            original_call(*args) do |*x|
-              sandbox.unprivileged do yield(*x) end
-            end
-          else
-            original_call(*args)
-          end
-        end
-      end
-    end
-
-    class UnprivilegedMethodWrapper < SandboxWrapper
-      def call(*args)
-        inherited_check(args)
-
-        sandbox.unprivileged do
-          if block_given?
-            original_call(*args) do |*x|
-              sandbox.privileged do yield(*x) end
-            end
-          else
-            original_call(*args)
-          end
-        end
       end
     end
 
@@ -169,41 +96,29 @@ public
       end
 
       def handle_method(klass, recv, method_name, method_id)
-
         return nil if (method_name == :eval)
 
-        if (method_name)
-          sandbox_inside = (klass.shadow.instance_method(method_name).body.file == sandbox.source)
-
-          if sandbox_inside
-            # allowed because the method are defined inside the sandbox
-            if sandbox.is_privileged
-              # wrap method call
-              return UnprivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-            end
-
-            if method_name == :inherited and wrap(recv).instance_of? Class
-              return InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-            end
-            # continue with the method call
-            return nil
-          end
-        end
-
-        unless sandbox.is_privileged
-          unless sandbox.privileges.allow?(klass,recv,method_name,method_id)
+	source = caller.first.split(":").first
+	privileges = sandbox.privileges[source]
+	
+	if privileges
+          unless privileges.allow?(klass,recv,method_name,method_id)
             raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
-          end
-
-          return PrivilegedMethodWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-        end
+	  end
+	end
 
         if method_name == :inherited and wrap(recv).instance_of? Class
-          return InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+          mw = InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+	  mw.recv.privileges = privileges
+	  return mw
         end
 
+	return nil
+
         nil
-      end
+     end
+
+
     end
 
     #
@@ -215,11 +130,12 @@ public
     # sandbox.privileges.allow_method :print
     # sandbox.run('print "hello world\n"')
     #
-    def run(code = "")
+    def run(privileges_ , code = "")
       handler = RallhookHandler.new
       handler.sandbox = self
-      @is_privileged = false
       alternative_binding = self.eval_binding
+      source = generate_id
+      self.privileges[source] = privileges_
 
       if block_given?
         handler.hook do
@@ -227,7 +143,7 @@ public
         end
       else
         handler.hook do
-          eval(code, alternative_binding, @source)
+          eval(code, alternative_binding, source)
         end
       end
     end
