@@ -110,8 +110,8 @@ public
           privileges = nil
           if source != dest_source then
             privileges = sandbox.privileges[source]
-
             if privileges
+              privileges = privileges.dup
               unless privileges.allow?(klass,recv,method_name,method_id)
               raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
               end
@@ -132,7 +132,7 @@ public
         end
 
         if privileges
-          privileges.redirection(klass,recv,method_name,method_id)
+          privileges.handle_redirection(klass,recv,method_id,sandbox)
         end
       end # if
     end # Class

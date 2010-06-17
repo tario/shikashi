@@ -96,7 +96,8 @@ public
       method_name = method_id.id2name
       return nil unless method_name
 
-      rclass = @redirect_hash[method_name]
+      rclass = @redirect_hash[method_name.to_sym]
+
       if rclass
         rclass.redirect_handler(klass, recv, method_name, method_id, sandbox)
       else
@@ -187,6 +188,15 @@ public
     @allowed_methods << method_name
   end
 
+  def handle_redirection(klass, recv, method_id, sandbox)
+    if @last_allowed
+      @last_allowed.handle_redirection(klass, recv, method_id, sandbox)
+    else
+      nil
+    end
+
+  end
+
   def allow?(klass, recv_, method_name, method_id)
 
     recv = ObjectWrapper.new(recv_)
@@ -199,6 +209,7 @@ public
       tmp = @allowed_objects[recv.object_id]
       if tmp
         if tmp.allowed?(method_name)
+          @last_allowed = tmp
           return true
         end
       end
@@ -207,6 +218,7 @@ public
         tmp = @allowed_klass_methods[m.owner.object_id]
         if tmp
           if tmp.allowed?(method_name)
+            @last_allowed = tmp
             return true
           end
         end
@@ -219,6 +231,7 @@ public
           tmp = @allowed_classes[last_class.object_id]
           if tmp
             if tmp.allowed?(method_name)
+              @last_allowed = tmp
               return true
             end
           end
@@ -236,6 +249,7 @@ public
         tmp = @allowed_kinds[last_class.object_id]
         if tmp
           if tmp.allowed?(method_name)
+            @last_allowed = tmp
             return true
           end
         end
@@ -250,7 +264,8 @@ public
       tmp = @allowed_instances[recv.class.object_id]
       if tmp
         if tmp.allowed?(method_name)
-          return true
+        @last_allowed = tmp
+        return true
         end
       end
 
@@ -262,10 +277,6 @@ public
     end
   end
 
-private
-  def allow_method_instance(klass,recv)
-
-  end
 end
 
 end
