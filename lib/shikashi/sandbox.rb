@@ -39,17 +39,24 @@ module Shikashi
     attr_reader :privileges
 #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
     attr_accessor :eval_binding
+    attr_accessor :chain
 
 #
 # Generate a random source file name for the sandbox, used internally
 #
+
     def generate_id
       "sandbox-#{rand(1000000)}"
     end
 
     def initialize
       @privileges = Hash.new
+      @chain = Hash.new
       self.eval_binding = Shikashi.global_binding
+    end
+
+    def add_source_chain(outer, inner)
+      @chain[inner] = outer
     end
 
     class SandboxWrapper < RallHook::Helper::MethodWrapper
@@ -86,6 +93,7 @@ module Shikashi
 
     class MethodWrapper < SandboxWrapper
       attr_accessor :privileges
+      attr_accessor :source
     end
 
     class InheritedWrapper < MethodWrapper
@@ -117,6 +125,7 @@ module Shikashi
       end
 
       def handle_method(klass, recv, method_name, method_id)
+        source = nil
         if method_name
 
           source = caller.first.split(":").first
@@ -125,13 +134,27 @@ module Shikashi
           privileges = nil
           if source != dest_source then
             privileges = sandbox.privileges[source]
-            if privileges
+            if privileges then
               privileges = privileges.dup
-              unless privileges.allow?(klass,recv,method_name,method_id)
-              raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
+              loop_source = source
+              loop_privileges = privileges
+
+              while loop_privileges and loop_source != dest_source
+                unless loop_privileges.allow?(klass,recv,method_name,method_id)
+                  raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
+                end
+
+                loop_privileges = nil
+                loop_source = sandbox.chain[loop_source]
+
+                if dest_source then
+                  loop_privileges = sandbox.privileges[loop_source]
+                else
+                  loop_privileges = nil
+                end
+
               end
             end
-
           end
 
           if method_name == :inherited and wrap(recv).instance_of? Class
@@ -149,6 +172,7 @@ module Shikashi
         if privileges
           privileges.handle_redirection(klass,recv,method_id,sandbox) do |mh|
               mh.privileges = privileges
+              mh.source = source
             end
         end
       end # if
@@ -168,6 +192,7 @@ module Shikashi
       handler.sandbox = self
       alternative_binding = self.eval_binding
       source = generate_id
+
       self.privileges[source] = privileges_
 
       if block_given?
