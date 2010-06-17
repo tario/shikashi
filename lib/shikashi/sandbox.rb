@@ -107,6 +107,7 @@ public
           source = caller.first.split(":").first
           dest_source = klass.shadow.instance_method(method_name).body.file
 
+          privileges = nil
           if source != dest_source then
             privileges = sandbox.privileges[source]
 
@@ -130,9 +131,11 @@ public
 
         end
 
-       nil
-      end
-    end
+        if privileges
+          privileges.redirection(klass,recv,method_name,method_id)
+        end
+      end # if
+    end # Class
 
     #
     #Run the code in sandbox with the given privileges

@@ -261,6 +261,11 @@ public
       false
     end
   end
+
+private
+  def allow_method_instance(klass,recv)
+
+  end
 end
 
 end
