@@ -40,11 +40,12 @@ module Shikashi
 #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
     attr_accessor :eval_binding
 
-private
+#
+# Generate a random source file name for the sandbox, used internally
+#
     def generate_id
       "sandbox-#{rand(1000000)}"
     end
-public
 
     def initialize
       @privileges = Hash.new
