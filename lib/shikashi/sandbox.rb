@@ -98,7 +98,13 @@ public
 
     class DummyWrapper < SandboxWrapper
       def call(*args)
-        original_call(*args)
+        if block_given?
+          original_call(*args) do |*x|
+            yield(*x)
+          end
+        else
+          original_call(*args)
+        end
       end
     end
 
