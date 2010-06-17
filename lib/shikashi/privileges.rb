@@ -99,7 +99,13 @@ public
       rclass = @redirect_hash[method_name.to_sym]
 
       if rclass
-        rclass.redirect_handler(klass, recv, method_name, method_id, sandbox)
+        if block_given?
+          rclass.redirect_handler(klass, recv, method_name, method_id, sandbox) do |mh|
+            yield(mh)
+          end
+        else
+          rclass.redirect_handler(klass, recv, method_name, method_id, sandbox)
+        end
       else
         nil
       end
@@ -190,7 +196,14 @@ public
 
   def handle_redirection(klass, recv, method_id, sandbox)
     if @last_allowed
-      @last_allowed.handle_redirection(klass, recv, method_id, sandbox)
+
+      if block_given?
+        @last_allowed.handle_redirection(klass, recv, method_id, sandbox) do |mh|
+          yield(mh)
+        end
+      else
+        @last_allowed.handle_redirection(klass, recv, method_id, sandbox)
+      end
     else
       nil
     end

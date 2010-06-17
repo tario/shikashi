@@ -74,12 +74,20 @@ public
           wrap.method_name = method_name
           wrap.method_id = method_id
           wrap.sandbox = sandbox
+
+          if block_given?
+            yield(wrap)
+          end
+
           return wrap.redirect_with_unhook(:call_with_rehook)
       end
     end
 
-    class InheritedWrapper < SandboxWrapper
+    class MethodWrapper < SandboxWrapper
       attr_accessor :privileges
+    end
+
+    class InheritedWrapper < MethodWrapper
       def call(*args)
         subclass = args.first
         privileges.object(subclass).allow :new
@@ -132,7 +140,9 @@ public
         end
 
         if privileges
-          privileges.handle_redirection(klass,recv,method_id,sandbox)
+          privileges.handle_redirection(klass,recv,method_id,sandbox) do |mh|
+              mh.privileges = privileges
+            end
         end
       end # if
     end # Class
