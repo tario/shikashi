@@ -87,6 +87,12 @@ public
         original_call(*args)
       end
     end
+    
+    class DummyWrapper < SandboxWrapper
+      def call(*args)
+        original_call(*args)
+      end
+    end
 
     class RallhookHandler < RallHook::HookHandler
       attr_accessor :sandbox
@@ -104,7 +110,6 @@ public
 	  dest_source = klass.shadow.instance_method(method_name).body.file
 	  
 	  if source != dest_source then
-	  
 	    privileges = sandbox.privileges[source]
 	
             if privileges
@@ -112,6 +117,7 @@ public
                 raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
 	      end
             end
+      
 	  end
 
           if method_name == :inherited and wrap(recv).instance_of? Class
@@ -119,10 +125,12 @@ public
             mw.recv.privileges = privileges
   	    return mw
           end
+    
+	  if dest_source == ""
+	    return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+          end
   
         end
-
-	return nil
 
         nil
      end
