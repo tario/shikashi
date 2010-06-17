@@ -87,7 +87,7 @@ public
         original_call(*args)
       end
     end
-    
+
     class DummyWrapper < SandboxWrapper
       def call(*args)
         original_call(*args)
@@ -102,38 +102,36 @@ public
       end
 
       def handle_method(klass, recv, method_name, method_id)
-	if method_name
+        if method_name
 
           source = caller.first.split(":").first
-	  dest_source = klass.shadow.instance_method(method_name).body.file
-	  
-	  if source != dest_source then
-	    privileges = sandbox.privileges[source]
-	
+          dest_source = klass.shadow.instance_method(method_name).body.file
+
+          if source != dest_source then
+            privileges = sandbox.privileges[source]
+
             if privileges
               unless privileges.allow?(klass,recv,method_name,method_id)
-                raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
-	      end
+              raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
+              end
             end
-      
-	  end
+
+          end
 
           if method_name == :inherited and wrap(recv).instance_of? Class
-            mw = InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-            mw.recv.privileges = privileges
-  	    return mw
+           mw = InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+           mw.recv.privileges = privileges
+    	     return mw
           end
-    
-	  if dest_source == ""
-	    return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+
+          if dest_source == ""
+            return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
           end
-  
+
         end
 
-        nil
-     end
-
-
+       nil
+      end
     end
 
     #
