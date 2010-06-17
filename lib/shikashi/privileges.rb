@@ -43,6 +43,7 @@ public
   class AllowedMethods
     def initialize
       @allowed_methods = Array.new
+      @redirect_hash = Hash.new
       @all = false
     end
 
@@ -83,6 +84,24 @@ public
     #Specifies that any method is allowed
     def allow_all
       @all = true
+    end
+
+    def redirect(method_name, method_wrapper_class)
+      allow method_name
+      @redirect_hash[method_name] = method_wrapper_class
+    end
+
+    def handle_redirection(klass, recv, method_id, sandbox)
+
+      method_name = method_id.id2name
+      return nil unless method_name
+
+      rclass = @redirect_hash[method_name]
+      if rclass
+        rclass.redirect_handler(klass, recv, method_name, method_id, sandbox)
+      else
+        nil
+      end
     end
   end
 
