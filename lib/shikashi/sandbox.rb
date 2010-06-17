@@ -97,20 +97,29 @@ public
 
       def handle_method(klass, recv, method_name, method_id)
         return nil if (method_name == :eval)
-
-	source = caller.first.split(":").first
-	privileges = sandbox.privileges[source]
 	
-	if privileges
-          unless privileges.allow?(klass,recv,method_name,method_id)
-            raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
-	  end
-	end
+	if method_name
 
-        if method_name == :inherited and wrap(recv).instance_of? Class
-          mw = InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-	  mw.recv.privileges = privileges
-	  return mw
+          source = caller.first.split(":").first
+	  dest_source = klass.shadow.instance_method(method_name).body.file
+	  
+	  if source != dest_source then
+	  
+	    privileges = sandbox.privileges[source]
+	
+            if privileges
+              unless privileges.allow?(klass,recv,method_name,method_id)
+                raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
+	      end
+            end
+	  end
+
+          if method_name == :inherited and wrap(recv).instance_of? Class
+            mw = InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
+            mw.recv.privileges = privileges
+  	    return mw
+          end
+  
         end
 
 	return nil
