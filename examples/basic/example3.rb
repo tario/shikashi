@@ -32,5 +32,14 @@ def self.inside_foo(a)
 end
 end
 ')
-A.inside_foo(false)
+
+# run privileged code in the sandbox, if not, the methods defined in the sandbox are invisible from outside
+s.run do
+	A.inside_foo(false)
+	begin
+	A.inside_foo(true)
+	rescue SecurityError => e
+		print "A.inside_foo(true) failed due security errors: #{e}\n"
+	end
+end
 
