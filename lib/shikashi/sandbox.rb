@@ -240,6 +240,9 @@ module Shikashi
     	     return mw
           end
 
+          return nil if method_name == :instance_eval
+          return nil if method_name == :binding
+
           if dest_source == ""
             return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
           end
