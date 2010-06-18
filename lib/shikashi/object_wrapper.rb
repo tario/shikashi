@@ -24,7 +24,7 @@ module Shikashi
 #Wraps an object and make all the calls using the implementation of the class Object
 #regardless of if the method are overloaded or not
 #
-#Example:
+#= Example
 #
 # class X
 #   def instance_of?(a)

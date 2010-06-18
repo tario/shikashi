@@ -33,8 +33,9 @@ module Shikashi
 #The sandbox class run the sandbox, because of internal behaviour only can be use one instance
 #of sandbox by thread (each different thread may have its own sandbox running in the same time)
 #
-#Example:
+#= Example
 #
+# require "rubygems"
 # require "shikashi"
 #
 # include Shikashi
@@ -80,8 +81,10 @@ module Shikashi
 
 #Base class to define redirections of methods called in the sandbox
 #
-#Example:
+#= Example 1
+#Basic redirection
 #
+# require "rubygems"
 # require "shikashi"
 #
 # class TestWrapper < Shikashi::Sandbox::MethodWrapper
@@ -110,6 +113,43 @@ module Shikashi
 #
 # s.run(perm,"X.new.foo")
 #
+#= Example 2
+#Proper block handling on redirection wrapper
+#
+# require "rubygems"
+# require "shikashi"
+#
+# class TestWrapper < Shikashi::Sandbox::MethodWrapper
+#   def call(*args)
+#     print "called each from source: #{source}\n"
+#     if block_given?
+#      original_call(*args) do |*x|
+#        yield(*x)
+#      end
+#     else
+#      original_call(*args)
+#     end
+#   end
+# end
+#
+# s = Shikashi::Sandbox.new
+# perm = Shikashi::Privileges.new
+# perm.instances_of(Array).allow :each
+# perm.instances_of(Enumerable::Enumerator).allow :each
+# perm.allow_method :print
+#
+# s.run perm, '
+#  array = [1,2,3]
+#
+#  array.each do |x|
+#    print x,"\n"
+#  end
+#
+#  enum = array.each
+#  enum.each do |x|
+#    print x,"\n"
+#  end
+# '
     class MethodWrapper < RallHook::Helper::MethodWrapper
       attr_accessor :sandbox
       attr_accessor :privileges
