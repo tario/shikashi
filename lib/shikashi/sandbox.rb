@@ -114,19 +114,6 @@ module Shikashi
       attr_accessor :sandbox
       attr_accessor :privileges
       attr_accessor :source
-      def objwrap(recv)
-        ObjectWrapper.new(recv)
-      end
-
-      def inherited_check(args)
-        if method_name == :inherited then
-          if objwrap(recv).instance_of? Class then
-            subclass = args.first
-            sandbox.privileges.object(subclass).allow :new
-            sandbox.privileges.instances_of(subclass).allow :initialize
-          end
-        end
-      end
 
       def self.redirect_handler(klass,recv,method_name,method_id,sandbox)
           wrap = self.new
