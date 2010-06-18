@@ -15,7 +15,7 @@ This package contains shikashi, an flexible sandbox of ruby code
 
 gem install shikashi-X.X.X.gem
 
-=== Usage
+== Usage
 
 This examples and more can be found in examples directory
 
