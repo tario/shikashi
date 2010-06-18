@@ -260,9 +260,15 @@ module Shikashi
     #
     #Example:
     #
+    # require "rubygems"
+    # require "shikashi"
+    #
+    # include Shikashi
+    #
     # sandbox = Sandbox.new
-    # sandbox.privileges.allow_method :print
-    # sandbox.run('print "hello world\n"')
+    # privileges = Privileges.new
+    # privileges.allow_method :print
+    # sandbox.run(privileges, 'print "hello world\n"')
     #
     def run(privileges_ , code = "")
       handler = RallhookHandler.new
