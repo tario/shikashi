@@ -1,4 +1,4 @@
-# call method defined in sandbox from outside
+# define a class outside the sandbox and use it in the sandbox
 
 require "rubygems"
 require "shikashi"
@@ -11,31 +11,36 @@ priv = Privileges.new
 # allow execution of print
 priv.allow_method :print
 
-# allow execution of method_added
-priv.allow_method :method_added
+class X
+	def foo
+		print "X#foo\n"
+	end
+	
+	def bar
+		system("echo hello world") # accepted, called from privileged context
+	end
+	
+	def privileged_operation( out )
+		# write to file specified in out
+		system("echo privileged operation > " + out)
+	end
+end
+# allow method new of class X
+priv.object(X).allow :new
 
-# allow execution of singleton_method_added
-priv.allow_method :singleton_method_added
+# allow instance methods of X. Note that the method privileged_operations is not allowed
+priv.instances_of(X).allow :foo, :bar
 
+priv.allow_method :=== # for exception handling
 #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
 s.run(priv, '
-module A
-def self.inside_foo(a)
-	print "inside_foo\n"
-	if (a)
-	system("ls -l") # denied
-	end
-end
+x = X.new
+x.foo
+x.bar
+
+begin
+x.privileged_operation # FAIL
+rescue SecurityError
+print "privileged_operation failed due security error\n"
 end
 ')
-
-# run privileged code in the sandbox, if not, the methods defined in the sandbox are invisible from outside
-s.run do
-	A.inside_foo(false)
-	begin
-	A.inside_foo(true)
-	rescue SecurityError => e
-		print "A.inside_foo(true) failed due security errors: #{e}\n"
-	end
-end
-
