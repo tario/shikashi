@@ -154,30 +154,32 @@ define a class from inside the sandbox and use it from outside
 
 === Redirection feature example
 
- require "rubygems"
- require "shikashi"
+Simple redirection of method, the method foo is replaced by TestWrapper::call
 
- class TestWrapper < Shikashi::Sandbox::MethodWrapper
-   def call(*args)
-     print "called foo from source: #{source}, arguments: #{args.inspect} \n"
-     original_call(*args)
-   end
- end
+	require "rubygems"
+	require "shikashi"
 
- class X
-   def foo
-     print "original foo\n"
-   end
- end
+	class TestWrapper < Shikashi::Sandbox::MethodWrapper
+	  def call(*args)
+	    print "called foo from source: #{source}, arguments: #{args.inspect} \n"
+	    original_call(*args)
+	  end
+	end
 
- s = Shikashi::Sandbox.new
- perm = Shikashi::Privileges.new
+	class X
+	  def foo
+	    print "original foo\n"
+	  end
+	end
 
- perm.object(X).allow :new
- perm.instances_of(X).allow :foo
+	s = Shikashi::Sandbox.new
+	perm = Shikashi::Privileges.new
 
- # redirect calls to foo to TestWrapper
- perm.instances_of(X).redirect :foo, TestWrapper
+	perm.object(X).allow :new
+	perm.instances_of(X).allow :foo
 
- s.run(perm,"X.new.foo")
+	# redirect calls to foo to TestWrapper
+	perm.instances_of(X).redirect :foo, TestWrapper
+
+	s.run(perm,"X.new.foo")
 
