@@ -273,7 +273,9 @@ module Shikashi
     # privileges.allow_method :print
     # sandbox.run(privileges, 'print "hello world\n"')
     #
-    def run(privileges_ , code = "")
+    def run(privileges_= nil , code = "")
+      privilges ||= Privileges.new
+
       handler = RallhookHandler.new
       handler.sandbox = self
       alternative_binding = self.eval_binding
