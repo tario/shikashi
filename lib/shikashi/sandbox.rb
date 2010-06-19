@@ -22,6 +22,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 require "rallhook"
 require "shikashi/privileges"
 require "shikashi/object_wrapper"
+require "shikashi/pick_argument"
 
 module Shikashi
 
@@ -273,13 +274,15 @@ module Shikashi
     # privileges.allow_method :print
     # sandbox.run(privileges, 'print "hello world\n"')
     #
-    def run(privileges_= nil , code = "")
-      privilges ||= Privileges.new
+    def run(*args)
+
+      privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+      code = args.pick(String,:code)
+      binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
+      source = args.pick(:source) do generate_id end
 
       handler = RallhookHandler.new
       handler.sandbox = self
-      alternative_binding = self.eval_binding
-      source = generate_id
 
       self.privileges[source] = privileges_
 
@@ -289,10 +292,12 @@ module Shikashi
         end
       else
         handler.hook do
-          eval(code, alternative_binding, source)
+          eval(code, binding_, source)
         end
       end
     end
+
+
   end
 end
 
