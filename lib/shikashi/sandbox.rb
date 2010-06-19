@@ -256,8 +256,34 @@ module Shikashi
       end # if
     end # Class
 
+    #Run the code in sandbox with the given privileges, also run privileged code in the sandbox context for
+    #execution of classes and methods defined in the sandbox from outside the sandbox if a block is passed
+    # (see examples)
     #
-    #Run the code in sandbox with the given privileges
+    #call-seq: run(arguments)
+    #
+    #Arguments
+    #
+    # :code       Mandatory argument of class String with the code to execute restricted in the sandbox
+    # :privileges Optional argument of class Shikashi::Sandbox::Privileges to indicate the restrictions of the
+    #             code executed in the sandbox. The default is an empty Privileges (absolutly no permission)
+    #             Must be of class Privileges or passed as hash_key (:privileges => privileges)
+    # :binding    Optional argument with the binding object of the context where the code is to be executed
+    #             The default is a binding in the global context
+    # :source     Optional argument to indicate the "source name", (visible in the backtraces). Only can
+    #             be specified as hash parameter
+    #
+    #
+    #The arguments can be passed in any order and using hash notation or not, examples:
+    #
+    # sandbox.run code, privileges
+    # sandbox.run code, :privileges => privileges
+    # sandbox.run :code => code, :privileges => privileges
+    # sandbox.run code, privileges, binding
+    # sandbox.run binding, code, privileges
+    # #etc
+    # sandbox.run binding, code, privileges, :source => source
+    # sandbox.run binding, :code => code, :privileges => privileges, :source => source
     #
     #Example:
     #
@@ -269,25 +295,50 @@ module Shikashi
     # sandbox = Sandbox.new
     # privileges = Privileges.new
     # privileges.allow_method :print
-    # sandbox.run(privileges, 'print "hello world\n"')
+    # sandbox.run('print "hello world\n"', :privileges => privileges)
     #
-    def run(*args)
+    #Example 2:
+    # require "rubygems"
+    # require "shikashi"
+    #
+    # include Shikashi
+    #
+    # sandbox = Sandbox.new
+    # privileges = Privileges.new
+    # privileges.allow_method :print
+    # privileges.allow_method :singleton_method_added
+    #
+    # sandbox.run('
+    #   def self.foo
+    #     print "hello world\n"
+    #   end
+    #    ', :privileges => privileges)
+    #
+    # #outside of this block, the method foo defined in the sandbox are invisible
+    # sandbox.run do
+    #   self.foo
+    # end
+    #
+    #
 
-      privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
-      code = args.pick(String,:code)
-      binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
-      source = args.pick(:source) do generate_id end
+    def run(*args)
 
       handler = RallhookHandler.new
       handler.sandbox = self
-
-      self.privileges[source] = privileges_
 
       if block_given?
         handler.hook do
             yield
         end
       else
+
+        privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+        code = args.pick(String,:code)
+        binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
+        source = args.pick(:source) do generate_id end
+
+        self.privileges[source] = privileges_
+
         handler.hook do
           eval(code, binding_, source)
         end
