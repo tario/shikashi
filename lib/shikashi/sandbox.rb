@@ -56,8 +56,6 @@ module Shikashi
 #
     attr_reader :privileges
 #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
-    attr_accessor :eval_binding
-#Hash with the chains of sources
     attr_reader :chain
 
 #
@@ -71,7 +69,6 @@ module Shikashi
     def initialize
       @privileges = Hash.new
       @chain = Hash.new
-      self.eval_binding = Shikashi.global_binding
     end
 
 # add a chain of sources, used internally
