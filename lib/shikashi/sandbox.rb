@@ -21,7 +21,6 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 require "rallhook"
 require "shikashi/privileges"
-require "shikashi/object_wrapper"
 require "shikashi/pick_argument"
 
 module Shikashi
@@ -195,10 +194,6 @@ module Shikashi
     class RallhookHandler < RallHook::HookHandler
       attr_accessor :sandbox
 
-      def wrap(recv)
-        ObjectWrapper.new(recv)
-      end
-
       def handle_method(klass, recv, method_name, method_id)
         source = nil
         if method_name
@@ -232,7 +227,7 @@ module Shikashi
             end
           end
 
-          if method_name == :inherited and wrap(recv).instance_of? Class
+          if method_name == :inherited and recv.instance_of? Class
            mw = InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
            mw.recv.privileges = privileges
     	     return mw

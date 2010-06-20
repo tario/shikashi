@@ -19,7 +19,6 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
 require "find"
-require "shikashi/object_wrapper"
 
 module Shikashi
 #
@@ -210,9 +209,8 @@ public
 
   end
 
-  def allow?(klass, recv_, method_name, method_id)
+  def allow?(klass, recv, method_name, method_id)
 
-    recv = ObjectWrapper.new(recv_)
     m = nil
     m = klass.shadow.instance_method(method_name) if method_name
 
