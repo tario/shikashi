@@ -266,16 +266,23 @@ Generate a random source file name for the sandbox, used internally
           <p>
 redirects a method with given name to a wrapper of the given class example:
 </p>
-<p>
-sandbox.redirect(:print, PrintWrapper) sandbox.redirect(:print,
-:wrapper_class =&gt; PrintWrapper) sandbox.redirect(:method_name =&gt;
-:print, :wrapper_class =&gt; PrintWrapper)
-</p>
+<pre>
+ class PrintWrapper &lt; Shikashi::Sandbox::MethodWrapper
+   def call(*args)
+     print &quot;invoked print\n&quot;
+     original_call(*args)
+   end
+ end
+
+ sandbox.redirect(:print, PrintWrapper)
+ sandbox.redirect(:print, :wrapper_class =&gt; PrintWrapper)
+ sandbox.redirect(:method_name =&gt; :print, :wrapper_class =&gt; PrintWrapper)
+</pre>
           <p><a class="source-toggle" href="#"
             onclick="toggleCode('M000023-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000023-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 364</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 370</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">redirect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
       <span class="ruby-identifier">mname</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Symbol</span>, <span class="ruby-identifier">:method_name</span>)
       <span class="ruby-identifier">wclass</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Class</span>, <span class="ruby-identifier">:wrapper_class</span>)
