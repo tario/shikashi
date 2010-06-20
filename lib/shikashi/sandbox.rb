@@ -353,8 +353,14 @@ module Shikashi
     end
 
 
-    # redirects a method with given name to a wrapper of the given class
-    # example:
+    #redirects a method with given name to a wrapper of the given class
+    #example:
+    # class PrintWrapper < Shikashi::Sandbox::MethodWrapper
+    #   def call(*args)
+    #     print "invoked print\n"
+    #     original_call(*args)
+    #   end
+    # end
     #
     # sandbox.redirect(:print, PrintWrapper)
     # sandbox.redirect(:print, :wrapper_class => PrintWrapper)
