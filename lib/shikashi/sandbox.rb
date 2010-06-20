@@ -68,6 +68,7 @@ module Shikashi
     def initialize
       @privileges = Hash.new
       @chain = Hash.new
+      @redirect_hash = Hash.new
     end
 
 # add a chain of sources, used internally
@@ -193,6 +194,7 @@ module Shikashi
 
     class RallhookHandler < RallHook::HookHandler
       attr_accessor :sandbox
+      attr_accessor :redirect
 
       def handle_method(klass, recv, method_name, method_id)
         source = nil
@@ -236,11 +238,19 @@ module Shikashi
           return nil if method_name == :instance_eval
           return nil if method_name == :binding
 
+          if method_name
+            wclass = @redirect[method_name.to_sym]
+            if wclass then
+              return wclass.redirect_handler(klass,recv,method_name,method_id,sandbox)
+            end
+          end
+
           if dest_source == ""
             return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
           end
 
         end
+
 
         if privileges
           privileges.handle_redirection(klass,recv,method_id,sandbox) do |mh|
@@ -248,6 +258,7 @@ module Shikashi
               mh.source = source
             end
         end
+
       end # if
     end # Class
 
@@ -319,6 +330,7 @@ module Shikashi
     def run(*args)
 
       handler = RallhookHandler.new
+      handler.redirect = @redirect_hash
       handler.sandbox = self
 
       if block_given?
@@ -340,6 +352,20 @@ module Shikashi
       end
     end
 
+
+    # redirects a method with given name to a wrapper of the given class
+    # example:
+    #
+    # sandbox.redirect(:print, PrintWrapper)
+    # sandbox.redirect(:print, :wrapper_class => PrintWrapper)
+    # sandbox.redirect(:method_name => :print, :wrapper_class => PrintWrapper)
+    #
+
+    def redirect(*args)
+      mname = args.pick(Symbol, :method_name)
+      wclass = args.pick(Class, :wrapper_class)
+      @redirect_hash[mname] = wclass
+    end
 
   end
 end
