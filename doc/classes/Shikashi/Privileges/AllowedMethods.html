@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Shikashi::Privileges::AllowedMethods</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Shikashi::Privileges::AllowedMethods</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/lib/shikashi/privileges_rb.html">
+                lib/shikashi/privileges.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+Used in <a href="../Privileges.html">Privileges</a> to store information
+about specified method permissions
+</p>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000015">allow</a>&nbsp;&nbsp;
+      <a href="#M000016">allow_all</a>&nbsp;&nbsp;
+      <a href="#M000014">allowed?</a>&nbsp;&nbsp;
+      <a href="#M000018">handle_redirection</a>&nbsp;&nbsp;
+      <a href="#M000013">new</a>&nbsp;&nbsp;
+      <a href="#M000017">redirect</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
+
+        <div class="method-heading">
+          <a href="#M000013" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000013-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 43</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+      <span class="ruby-ivar">@allowed_methods</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>
+      <span class="ruby-ivar">@redirect_hash</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
+      <span class="ruby-ivar">@all</span> = <span class="ruby-keyword kw">false</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000015" class="method-detail">
+        <a name="M000015"></a>
+
+        <div class="method-heading">
+          <a href="#M000015" class="method-signature">
+          <span class="method-name">allow</span><span class="method-args">(*method_names)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Specifies that a method or list of methods are allowed Example
+</p>
+<pre>
+ allowed_methods = AllowedMethods.new
+ allowed_methods.allow :foo
+ allowed_methods.allow :foo, :bar
+ allowed_methods.allow :foo, :bar, :test
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000015-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 77</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">method_names</span>)
+      <span class="ruby-identifier">method_names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mn</span><span class="ruby-operator">|</span>
+      <span class="ruby-ivar">@allowed_methods</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">mn</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000016" class="method-detail">
+        <a name="M000016"></a>
+
+        <div class="method-heading">
+          <a href="#M000016" class="method-signature">
+          <span class="method-name">allow_all</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Specifies that any method is allowed
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000016-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000016-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 84</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow_all</span>
+      <span class="ruby-ivar">@all</span> = <span class="ruby-keyword kw">true</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000014" class="method-detail">
+        <a name="M000014"></a>
+
+        <div class="method-heading">
+          <a href="#M000014" class="method-signature">
+          <span class="method-name">allowed?</span><span class="method-args">(method_name)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+return true if the method named method_name is allowed Example
+</p>
+<pre>
+ allowed_methods = AllowedMethods.new
+ allowed_methods.allowed? :foo # =&gt; false
+ allowed_methods.allow :foo
+ allowed_methods.allowed? :foo # =&gt; true
+ allowed_methods.allow_all
+ allowed_methods.allowed? :bar # =&gt; true
+
+ Privileges#instance_of, Privileges#methods_of and Privileges#object returns the corresponding
+ instance of AllowedMethods
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000014-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 61</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allowed?</span>(<span class="ruby-identifier">method_name</span>)
+       <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@all</span>
+         <span class="ruby-keyword kw">true</span>
+       <span class="ruby-keyword kw">else</span>
+         <span class="ruby-ivar">@allowed_methods</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">method_name</span>)
+       <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000018" class="method-detail">
+        <a name="M000018"></a>
+
+        <div class="method-heading">
+          <a href="#M000018" class="method-signature">
+          <span class="method-name">handle_redirection</span><span class="method-args">(klass, recv, method_id, sandbox) {|mh| ...}</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000018-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000018-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 93</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_id</span>, <span class="ruby-identifier">sandbox</span>)
+
+      <span class="ruby-identifier">method_name</span> = <span class="ruby-identifier">method_id</span>.<span class="ruby-identifier">id2name</span>
+      <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">method_name</span>
+
+      <span class="ruby-identifier">rclass</span> = <span class="ruby-ivar">@redirect_hash</span>[<span class="ruby-identifier">method_name</span>.<span class="ruby-identifier">to_sym</span>]
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">rclass</span>
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+          <span class="ruby-identifier">rclass</span>.<span class="ruby-identifier">redirect_handler</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>, <span class="ruby-identifier">method_id</span>, <span class="ruby-identifier">sandbox</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mh</span><span class="ruby-operator">|</span>
+            <span class="ruby-keyword kw">yield</span>(<span class="ruby-identifier">mh</span>)
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-identifier">rclass</span>.<span class="ruby-identifier">redirect_handler</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>, <span class="ruby-identifier">method_id</span>, <span class="ruby-identifier">sandbox</span>)
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">else</span>
+        <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000017" class="method-detail">
+        <a name="M000017"></a>
+
+        <div class="method-heading">
+          <a href="#M000017" class="method-signature">
+          <span class="method-name">redirect</span><span class="method-args">(method_name, method_wrapper_class)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000017-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000017-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 88</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">redirect</span>(<span class="ruby-identifier">method_name</span>, <span class="ruby-identifier">method_wrapper_class</span>)
+      <span class="ruby-identifier">allow</span> <span class="ruby-identifier">method_name</span>
+      <span class="ruby-ivar">@redirect_hash</span>[<span class="ruby-identifier">method_name</span>] = <span class="ruby-identifier">method_wrapper_class</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

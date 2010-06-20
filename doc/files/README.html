@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>File: README</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+  <div id="fileHeader">
+    <h1>README</h1>
+    <table class="header-table">
+    <tr class="top-aligned-row">
+      <td><strong>Path:</strong></td>
+      <td>README
+      </td>
+    </tr>
+    <tr class="top-aligned-row">
+      <td><strong>Last Update:</strong></td>
+      <td>Sun Jun 20 14:50:37 -0300 2010</td>
+    </tr>
+    </table>
+  </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <h1><a href="../classes/Shikashi.html">Shikashi</a> - A flexible sandbox for ruby</h1>
+<p>
+<a href="../classes/Shikashi.html">Shikashi</a> is an sandbox for ruby that
+handles all ruby method calls executed in the interpreter to allow or deny
+these calls depending on the receiver object, the method name, the source
+file from where the call was originated and the source file where the
+called method is implemented.
+</p>
+<p>
+The permissions for each sandboxed run is fully configurable and the
+implementation of the methods called from the sandbox can be replaced
+transparently (i.e: replace method IO#write in the sandbox context to
+capture the standard output of the script)
+</p>
+<p>
+The implementation of shikashi is pure ruby and it is based on rallhook, an
+amending of the ruby interpreter (see <a
+href="http://tario.github.com/rallhook/doc">tario.github.com/rallhook/doc</a>)
+</p>
+<h2>Installation</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li>rallhook &gt;= 0.7.0 (found at <a
+href="http://github.com/tario/rallhook">github.com/tario/rallhook</a>)
+
+</li>
+</ul>
+<h3>Gem installation</h3>
+<ul>
+<li>Download the last version of the gem from <a
+href="http://github.com/tario/shikashi/downloads">github.com/tario/shikashi/downloads</a>
+
+</li>
+<li>Install the gem with the following;
+
+</li>
+</ul>
+<p>
+gem install shikashi-X.X.X.gem.
+</p>
+<h2>Documentation</h2>
+<p>
+Full API documentation can be found on: <a
+href="http://tario.github.com/shikashi/doc">tario.github.com/shikashi/doc</a>/
+</p>
+<h2>Usage</h2>
+<p>
+This examples and more can be found in examples directory
+</p>
+<h3>Basic Example</h3>
+<p>
+Hello world from a sandbox
+</p>
+<pre>
+        require &quot;rubygems&quot;
+        require &quot;shikashi&quot;
+
+        include Shikashi
+
+        s = Sandbox.new
+        priv = Privileges.new
+        priv.allow_method :print
+
+        s.run(priv, 'print &quot;hello world\n&quot;')
+</pre>
+<h3>Basic Example 2</h3>
+<p>
+Call external method from inside the sandbox
+</p>
+<pre>
+        require &quot;rubygems&quot;
+        require &quot;shikashi&quot;
+
+        include Shikashi
+
+        def foo
+                # privileged code, can do any operation
+                print &quot;foo\n&quot;
+        end
+
+        s = Sandbox.new
+        priv = Privileges.new
+
+        # allow execution of foo in this object
+        priv.object(self).allow :foo
+
+        # allow execution of method :times on instances of Fixnum
+        priv.instances_of(Fixnum).allow :times
+
+        #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
+        s.run(priv, &quot;2.times do foo end&quot;)
+</pre>
+<h3>Basic Example 3</h3>
+<p>
+Define a class outside the sandbox and use it in the sandbox
+</p>
+<pre>
+        require &quot;rubygems&quot;
+        require &quot;shikashi&quot;
+
+        include Shikashi
+
+        s = Sandbox.new
+        priv = Privileges.new
+
+        # allow execution of print
+        priv.allow_method :print
+
+        class X
+                def foo
+                        print &quot;X#foo\n&quot;
+                end
+
+                def bar
+                        system(&quot;echo hello world&quot;) # accepted, called from privileged context
+                end
+
+                def privileged_operation( out )
+                        # write to file specified in out
+                        system(&quot;echo privileged operation &gt; &quot; + out)
+                end
+        end
+        # allow method new of class X
+        priv.object(X).allow :new
+
+        # allow instance methods of X. Note that the method privileged_operations is not allowed
+        priv.instances_of(X).allow :foo, :bar
+
+        priv.allow_method :=== # for exception handling
+        #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
+        s.run(priv, '
+        x = X.new
+        x.foo
+        x.bar
+
+        begin
+        x.privileged_operation # FAIL
+        rescue SecurityError
+        print &quot;privileged_operation failed due security error\n&quot;
+        end
+        ')
+</pre>
+<h3>Basic Example 4</h3>
+<p>
+define a class from inside the sandbox and use it from outside
+</p>
+<pre>
+        require &quot;rubygems&quot;
+        require &quot;shikashi&quot;
+
+        include Shikashi
+
+        s = Sandbox.new
+        priv = Privileges.new
+
+        # allow execution of print
+        priv.allow_method :print
+
+        # allow definition of classes
+        priv.allow_class_definitions
+
+        #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
+        s.run(priv, '
+        class X
+                def foo
+                        print &quot;X#foo\n&quot;
+                end
+
+                def bar
+                        system(&quot;ls -l&quot;)
+                end
+        end
+        ')
+
+        # run privileged code in the sandbox, if not, the methods defined in the sandbox are invisible from outside
+        s.run do
+                x = X.new
+                x.foo
+                begin
+                x.bar
+                rescue SecurityError =&gt; e
+                        print &quot;x.bar failed due security errors: #{e}\n&quot;
+                end
+        end
+</pre>
+<h3>Redirection feature example</h3>
+<p>
+Simple redirection of method, the method foo is replaced by
+TestWrapper::call
+</p>
+<pre>
+        require &quot;rubygems&quot;
+        require &quot;shikashi&quot;
+
+        class TestWrapper &lt; Shikashi::Sandbox::MethodWrapper
+          def call(*args)
+            print &quot;called foo from source: #{source}, arguments: #{args.inspect} \n&quot;
+            original_call(*args)
+          end
+        end
+
+        class X
+          def foo
+            print &quot;original foo\n&quot;
+          end
+        end
+
+        s = Shikashi::Sandbox.new
+        perm = Shikashi::Privileges.new
+
+        perm.object(X).allow :new
+        perm.instances_of(X).allow :foo
+
+        # redirect calls to foo to TestWrapper
+        perm.instances_of(X).redirect :foo, TestWrapper
+
+        s.run(perm,&quot;X.new.foo&quot;)
+</pre>
+
+    </div>
+
+
+   </div>
+
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

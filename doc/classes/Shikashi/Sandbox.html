@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Shikashi::Sandbox</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Shikashi::Sandbox</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/shikashi/sandbox_rb.html">
+                lib/shikashi/sandbox.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                Object
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+    <div id="description">
+      <p>
+The sandbox class <a href="Sandbox.html#M000022">run</a> the sandbox,
+because of internal behaviour only can be use one instance of sandbox by
+thread (each different thread may have its own sandbox running in the same
+time)
+</p>
+<h1>Example</h1>
+<pre>
+ require &quot;rubygems&quot;
+ require &quot;shikashi&quot;
+
+ include Shikashi
+
+ s = Sandbox.new
+ priv = Privileges.new
+ priv.allow_method :print
+
+ s.run(priv, 'print &quot;hello world\n&quot;')
+</pre>
+
+    </div>
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000021">add_source_chain</a>&nbsp;&nbsp;
+      <a href="#M000019">generate_id</a>&nbsp;&nbsp;
+      <a href="#M000020">new</a>&nbsp;&nbsp;
+      <a href="#M000023">redirect</a>&nbsp;&nbsp;
+      <a href="#M000022">run</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Class <a href="Sandbox/DummyWrapper.html" class="link">Shikashi::Sandbox::DummyWrapper</a><br />
+Class <a href="Sandbox/InheritedWrapper.html" class="link">Shikashi::Sandbox::InheritedWrapper</a><br />
+Class <a href="Sandbox/MethodWrapper.html" class="link">Shikashi::Sandbox::MethodWrapper</a><br />
+Class <a href="Sandbox/RallhookHandler.html" class="link">Shikashi::Sandbox::RallhookHandler</a><br />
+
+    </div>
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">chain</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc">
+Binding of execution, the default is a binding in a global context allowing
+the definition of module of classes
+
+</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">privileges</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc">
+array of privileges of restricted code within sandbox
+
+<p>
+Example
+</p>
+<pre>
+ sandbox.privileges[source].allow_method :raise
+</pre>
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000020" class="method-detail">
+        <a name="M000020"></a>
+
+        <div class="method-heading">
+          <a href="#M000020" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000020-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 68</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+      <span class="ruby-ivar">@privileges</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
+      <span class="ruby-ivar">@chain</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
+      <span class="ruby-ivar">@redirect_hash</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000021" class="method-detail">
+        <a name="M000021"></a>
+
+        <div class="method-heading">
+          <a href="#M000021" class="method-signature">
+          <span class="method-name">add_source_chain</span><span class="method-args">(outer, inner)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+add a chain of sources, used internally
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000021-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 75</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_source_chain</span>(<span class="ruby-identifier">outer</span>, <span class="ruby-identifier">inner</span>)
+      <span class="ruby-ivar">@chain</span>[<span class="ruby-identifier">inner</span>] = <span class="ruby-identifier">outer</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000019" class="method-detail">
+        <a name="M000019"></a>
+
+        <div class="method-heading">
+          <a href="#M000019" class="method-signature">
+          <span class="method-name">generate_id</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Generate a random source file name for the sandbox, used internally
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000019-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000019-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 64</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">generate_id</span>
+      <span class="ruby-node">&quot;sandbox-#{rand(1000000)}&quot;</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000023" class="method-detail">
+        <a name="M000023"></a>
+
+        <div class="method-heading">
+          <a href="#M000023" class="method-signature">
+          <span class="method-name">redirect</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+redirects a method with given name to a wrapper of the given class example:
+</p>
+<p>
+sandbox.redirect(:print, PrintWrapper) sandbox.redirect(:print,
+:wrapper_class =&gt; PrintWrapper) sandbox.redirect(:method_name =&gt;
+:print, :wrapper_class =&gt; PrintWrapper)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000023-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000023-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 364</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">redirect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+      <span class="ruby-identifier">mname</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Symbol</span>, <span class="ruby-identifier">:method_name</span>)
+      <span class="ruby-identifier">wclass</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Class</span>, <span class="ruby-identifier">:wrapper_class</span>)
+      <span class="ruby-ivar">@redirect_hash</span>[<span class="ruby-identifier">mname</span>] = <span class="ruby-identifier">wclass</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
+
+        <div class="method-heading">
+          <a href="#M000022" class="method-signature">
+          <span class="method-name"> run(arguments)<br />
+</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Run the code in sandbox with the given privileges, also <a
+href="Sandbox.html#M000022">run</a> privileged code in the sandbox context
+for execution of classes and methods defined in the sandbox from outside
+the sandbox if a block is passed
+</p>
+<pre>
+ (see examples)
+</pre>
+<p>
+<a href="../Arguments.html">Arguments</a>
+</p>
+<pre>
+ :code       Mandatory argument of class String with the code to execute restricted in the sandbox
+ :privileges Optional argument of class Shikashi::Sandbox::Privileges to indicate the restrictions of the
+             code executed in the sandbox. The default is an empty Privileges (absolutly no permission)
+             Must be of class Privileges or passed as hash_key (:privileges =&gt; privileges)
+ :binding    Optional argument with the binding object of the context where the code is to be executed
+             The default is a binding in the global context
+ :source     Optional argument to indicate the &quot;source name&quot;, (visible in the backtraces). Only can
+             be specified as hash parameter
+</pre>
+<p>
+The arguments can be passed in any order and using hash notation or not,
+examples:
+</p>
+<pre>
+ sandbox.run code, privileges
+ sandbox.run code, :privileges =&gt; privileges
+ sandbox.run :code =&gt; code, :privileges =&gt; privileges
+ sandbox.run code, privileges, binding
+ sandbox.run binding, code, privileges
+ #etc
+ sandbox.run binding, code, privileges, :source =&gt; source
+ sandbox.run binding, :code =&gt; code, :privileges =&gt; privileges, :source =&gt; source
+</pre>
+<p>
+Example:
+</p>
+<pre>
+ require &quot;rubygems&quot;
+ require &quot;shikashi&quot;
+
+ include Shikashi
+
+ sandbox = Sandbox.new
+ privileges = Privileges.new
+ privileges.allow_method :print
+ sandbox.run('print &quot;hello world\n&quot;', :privileges =&gt; privileges)
+</pre>
+<p>
+Example 2:
+</p>
+<pre>
+ require &quot;rubygems&quot;
+ require &quot;shikashi&quot;
+
+ include Shikashi
+
+ sandbox = Sandbox.new
+ privileges = Privileges.new
+ privileges.allow_method :print
+ privileges.allow_method :singleton_method_added
+
+ sandbox.run('
+   def self.foo
+     print &quot;hello world\n&quot;
+   end
+    ', :privileges =&gt; privileges)
+
+ #outside of this block, the method foo defined in the sandbox are invisible
+ sandbox.run do
+   self.foo
+ end
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000022-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000022-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 330</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+
+      <span class="ruby-identifier">handler</span> = <span class="ruby-constant">RallhookHandler</span>.<span class="ruby-identifier">new</span>
+      <span class="ruby-identifier">handler</span>.<span class="ruby-identifier">redirect</span> = <span class="ruby-ivar">@redirect_hash</span>
+      <span class="ruby-identifier">handler</span>.<span class="ruby-identifier">sandbox</span> = <span class="ruby-keyword kw">self</span>
+
+      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+        <span class="ruby-identifier">handler</span>.<span class="ruby-identifier">hook</span> <span class="ruby-keyword kw">do</span>
+            <span class="ruby-keyword kw">yield</span>
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">else</span>
+
+        <span class="ruby-identifier">privileges_</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Privileges</span>,<span class="ruby-identifier">:privileges</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-constant">Privileges</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword kw">end</span>
+        <span class="ruby-identifier">code</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">String</span>,<span class="ruby-identifier">:code</span>)
+        <span class="ruby-identifier">binding_</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Binding</span>,<span class="ruby-identifier">:binding</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-constant">Shikashi</span>.<span class="ruby-identifier">global_binding</span> <span class="ruby-keyword kw">end</span>
+        <span class="ruby-identifier">source</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:source</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-identifier">generate_id</span> <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">privileges</span>[<span class="ruby-identifier">source</span>] = <span class="ruby-identifier">privileges_</span>
+
+        <span class="ruby-identifier">handler</span>.<span class="ruby-identifier">hook</span> <span class="ruby-keyword kw">do</span>
+          <span class="ruby-identifier">eval</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">binding_</span>, <span class="ruby-identifier">source</span>)
+        <span class="ruby-keyword kw">end</span>
+      <span class="ruby-keyword kw">end</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
