@@ -19,10 +19,16 @@ The implementation of shikashi is pure ruby and it is based on rallhook, an amen
 
 === Gem installation
 
+Run in the terminal:
+
+sudo gem install shikashi
+
+OR
+
 * Download the last version of the gem from http://github.com/tario/shikashi/downloads
 * Install the gem with the following;
 
-gem install shikashi-X.X.X.gem.
+sudo gem install shikashi-X.X.X.gem.
 
 == Documentation
 
