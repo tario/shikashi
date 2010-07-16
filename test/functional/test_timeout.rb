@@ -14,7 +14,7 @@ class TimeoutTest <  Test::Unit::TestCase
         Shikashi::Sandbox.new.run("sleep execution_delay", priv, binding, :timeout => timeout)
       end
     else
-      assert_not_raise do
+      assert_nothing_raised do
         Shikashi::Sandbox.new.run("sleep execution_delay", priv, binding, :timeout => timeout)
       end
     end
