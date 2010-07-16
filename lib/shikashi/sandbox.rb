@@ -18,10 +18,11 @@ you should have received a copy of the gnu general public license
 along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
-
+require "rubygems"
 require "rallhook"
 require "shikashi/privileges"
 require "shikashi/pick_argument"
+require "timeout"
 
 module Shikashi
 
@@ -29,6 +30,11 @@ module Shikashi
     attr_accessor :global_binding
   end
 
+  module Timeout
+    class Error < Exception
+
+    end
+  end
 
 #The sandbox class run the sandbox, because of internal behaviour only can be use one instance
 #of sandbox by thread (each different thread may have its own sandbox running in the same time)
@@ -333,22 +339,32 @@ module Shikashi
       handler.redirect = @redirect_hash
       handler.sandbox = self
 
-      if block_given?
-        handler.hook do
-            yield
+      t = args.pick(:timeout) do nil end
+      raise Shikashi::Timeout::Error if t == 0
+      t = t || 0
+
+      begin
+        timeout t do
+          if block_given?
+            handler.hook do
+                yield
+            end
+          else
+
+            privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+            code = args.pick(String,:code)
+            binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
+            source = args.pick(:source) do generate_id end
+
+            self.privileges[source] = privileges_
+
+            handler.hook do
+              eval(code, binding_, source)
+            end
+          end
         end
-      else
-
-        privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
-        code = args.pick(String,:code)
-        binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
-        source = args.pick(:source) do generate_id end
-
-        self.privileges[source] = privileges_
-
-        handler.hook do
-          eval(code, binding_, source)
-        end
+      rescue ::Timeout::Error
+        raise Shikashi::Timeout::Error
       end
     end
 
