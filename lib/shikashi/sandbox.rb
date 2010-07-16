@@ -31,6 +31,9 @@ module Shikashi
   end
 
   module Timeout
+
+
+    #raised when reach the timeout in a script execution restricted by timeout (see Sandbox#run)
     class Error < Exception
 
     end
@@ -284,6 +287,8 @@ module Shikashi
     #             The default is a binding in the global context
     # :source     Optional argument to indicate the "source name", (visible in the backtraces). Only can
     #             be specified as hash parameter
+    # :timeout    Optional argument to restrict the execution time of the script to a given value in seconds
+    #             (accepts integer and decimal values), when timeout hits Shikashi::Timeout::Error is raised
     #
     #
     #The arguments can be passed in any order and using hash notation or not, examples:
