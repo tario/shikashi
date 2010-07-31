@@ -253,7 +253,7 @@ module Shikashi
 
 
         if privileges
-          privileges.handle_redirection(klass,recv,method_id,sandbox) do |mh|
+          privileges.handle_redirection(klass,recv,method_name,method_id,sandbox) do |mh|
               mh.privileges = privileges
               mh.source = source
             end

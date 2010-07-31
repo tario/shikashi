@@ -90,11 +90,7 @@ public
       @redirect_hash[method_name] = method_wrapper_class
     end
 
-    def handle_redirection(klass, recv, method_id, sandbox)
-
-      method_name = method_id.id2name
-      return nil unless method_name
-
+    def handle_redirection(klass, recv, method_name, method_id, sandbox)
       rclass = @redirect_hash[method_name.to_sym]
 
       if rclass
@@ -193,15 +189,15 @@ public
     @allowed_methods << method_name
   end
 
-  def handle_redirection(klass, recv, method_id, sandbox)
+  def handle_redirection(klass, recv, method_name, method_id, sandbox)
     if @last_allowed
 
       if block_given?
-        @last_allowed.handle_redirection(klass, recv, method_id, sandbox) do |mh|
+        @last_allowed.handle_redirection(klass, recv, method_name, method_id, sandbox) do |mh|
           yield(mh)
         end
       else
-        @last_allowed.handle_redirection(klass, recv, method_id, sandbox)
+        @last_allowed.handle_redirection(klass, recv, method_name, method_id, sandbox)
       end
     else
       nil
