@@ -1,1 +1,3 @@
-0.2.0	Optimized Cymbol::resolv by using a singleton of Cymbol::Resolv
+0.1.1	Fixed issue 2: example2 failed when run under ruby1.9 (http://github.com/tario/shikashi/issues#issue/2)
+
+0.1.0	First functional release
