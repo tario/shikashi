@@ -246,6 +246,7 @@ module Shikashi
           end
 
           if dest_source == ""
+            return nil if (method_name.to_s == "core#define_method")
             return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
           end
 
