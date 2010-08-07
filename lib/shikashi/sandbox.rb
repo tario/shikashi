@@ -247,6 +247,7 @@ module Shikashi
 
           if dest_source == ""
             return nil if (method_name.to_s == "core#define_method")
+            return nil if (method_name.to_s == "core#define_singleton_method")
             return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
           end
 
