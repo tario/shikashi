@@ -11,11 +11,8 @@ priv = Privileges.new
 # allow execution of print
 priv.allow_method :print
 
-# allow execution of method_added
-priv.allow_method :method_added
-
-# allow execution of singleton_method_added
-priv.allow_method :singleton_method_added
+# allow singleton methods
+priv.allow_singleton_methods
 
 #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
 s.run(priv, '
