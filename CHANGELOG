@@ -1,3 +1,5 @@
+0.1.2	Fixed compatibility issues with ruby1.9
+
 0.1.1	Fixed issue 2: example2 failed when run under ruby1.9 (http://github.com/tario/shikashi/issues#issue/2)
 
 0.1.0	First functional release
