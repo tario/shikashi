@@ -19,6 +19,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
 require "rubygems"
+require "rallhook"
 require "evalhook"
 require "shikashi/privileges"
 require "shikashi/pick_argument"
