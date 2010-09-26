@@ -193,8 +193,11 @@ module Shikashi
       attr_accessor :sandbox
       attr_accessor :redirect
 
-      def handle_method(klass, recv, method_name, method_id)
+      def handle_method(klass, recv, method_name)
         source = nil
+
+        method_id = 0
+
         if method_name
 
           source = caller.first.split(":").first
