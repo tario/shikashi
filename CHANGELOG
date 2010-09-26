@@ -1,2 +1,4 @@
-0.2.0	Added timeout restriction to the scripts executed in the sandbox (default unlimited)
+0.2.0	Use of evalhook to hook the method calls in the place of rallhook
+
+		Added timeout restriction to the scripts executed in the sandbox (default unlimited)
 
