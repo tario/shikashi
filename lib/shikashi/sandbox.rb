@@ -201,7 +201,7 @@ module Shikashi
         if method_name
 
           source = caller.first.split(":").first
-          dest_source = klass.shadow.instance_method(method_name).body.file
+          dest_source = klass.instance_method(method_name).body.file
 
           privileges = nil
           if source != dest_source then

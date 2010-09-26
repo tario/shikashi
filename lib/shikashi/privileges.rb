@@ -212,7 +212,7 @@ public
   def allow?(klass, recv, method_name, method_id)
 
     m = nil
-    m = klass.shadow.instance_method(method_name) if method_name
+    m = klass.instance_method(method_name) if method_name
 
     begin
       return true if @allowed_methods.include?(method_name)
