@@ -19,7 +19,7 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
 require "rubygems"
-require "rallhook"
+require "evalhook"
 require "shikashi/privileges"
 require "shikashi/pick_argument"
 require "timeout"
@@ -157,7 +157,7 @@ module Shikashi
 #    print x,"\n"
 #  end
 # '
-    class MethodWrapper < RallHook::Helper::MethodWrapper
+    class MethodWrapper < EvalHook::Helper::MethodWrapper
       attr_accessor :sandbox
       attr_accessor :privileges
       attr_accessor :source
@@ -201,7 +201,7 @@ module Shikashi
       end
     end
 
-    class RallhookHandler < RallHook::HookHandler
+    class EvalhookHandler < EvalHook::HookHandler
       attr_accessor :sandbox
       attr_accessor :redirect
 
