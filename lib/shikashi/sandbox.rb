@@ -227,6 +227,8 @@ module Shikashi
                 end
 
               end
+            else
+              raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
             end
           end
 
