@@ -201,12 +201,13 @@ module Shikashi
 
         if method_name
 
-          source = caller.first.split(":").first
+          source = caller[1].split(":").first
           dest_source = klass.instance_method(method_name).body.file
 
           privileges = nil
           if source != dest_source then
             privileges = sandbox.privileges[source]
+
             if privileges then
               privileges = privileges.dup
               loop_source = source
@@ -227,8 +228,6 @@ module Shikashi
                 end
 
               end
-            else
-              raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
             end
           end
 
