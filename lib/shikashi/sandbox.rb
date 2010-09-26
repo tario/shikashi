@@ -157,24 +157,12 @@ module Shikashi
 #    print x,"\n"
 #  end
 # '
-    class MethodWrapper < EvalHook::Helper::MethodWrapper
+    class MethodWrapper
       attr_accessor :sandbox
       attr_accessor :privileges
       attr_accessor :source
 
       def self.redirect_handler(klass,recv,method_name,method_id,sandbox)
-          wrap = self.new
-          wrap.klass = klass
-          wrap.recv = recv
-          wrap.method_name = method_name
-          wrap.method_id = method_id
-          wrap.sandbox = sandbox
-
-          if block_given?
-            yield(wrap)
-          end
-
-          return wrap.redirect_with_unhook(:call_with_rehook)
       end
     end
 
@@ -340,7 +328,7 @@ module Shikashi
 
     def run(*args)
 
-      handler = RallhookHandler.new
+      handler = EvalhookHandler.new
       handler.redirect = @redirect_hash
       handler.sandbox = self
 
@@ -350,23 +338,14 @@ module Shikashi
 
       begin
         timeout t do
-          if block_given?
-            handler.hook do
-                yield
-            end
-          else
+          privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+          code = args.pick(String,:code)
+          binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
+          source = args.pick(:source) do generate_id end
 
-            privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
-            code = args.pick(String,:code)
-            binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
-            source = args.pick(:source) do generate_id end
+          self.privileges[source] = privileges_
 
-            self.privileges[source] = privileges_
-
-            handler.hook do
-              eval(code, binding_, source)
-            end
-          end
+          handler.evalhook(code, binding_, source)
         end
       rescue ::Timeout::Error
         raise Shikashi::Timeout::Error
