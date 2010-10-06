@@ -167,29 +167,6 @@ module Shikashi
       end
     end
 
-    # Used internally
-    class InheritedWrapper < MethodWrapper
-      def call(*args)
-        subclass = args.first
-        privileges.object(subclass).allow :new
-        privileges.instances_of(subclass).allow :initialize
-        original_call(*args)
-      end
-    end
-
-    # Used internally
-    class DummyWrapper < MethodWrapper
-      def call(*args)
-        if block_given?
-          original_call(*args) do |*x|
-            yield(*x)
-          end
-        else
-          original_call(*args)
-        end
-      end
-    end
-
     class EvalhookHandler < EvalHook::HookHandler
       attr_accessor :sandbox
       attr_accessor :redirect
@@ -231,12 +208,6 @@ module Shikashi
             end
           end
 
-          if method_name == :inherited and recv.instance_of? Class
-           mw = InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-           mw.recv.privileges = privileges
-    	     return mw
-          end
-
           return nil if method_name == :instance_eval
           return nil if method_name == :binding
 
@@ -245,10 +216,6 @@ module Shikashi
             if wclass then
               return wclass.redirect_handler(klass,recv,method_name,method_id,sandbox)
             end
-          end
-
-          if dest_source == ""
-            return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
           end
 
         end
