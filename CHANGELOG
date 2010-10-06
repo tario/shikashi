@@ -1,4 +1,6 @@
-0.2.0	Use of evalhook to hook the method calls in the place of rallhook
+0.2.0	Removed rallhook dependency replaced by getsource
+
+		Use of evalhook to hook the method calls in the place of rallhook
 
 		Added timeout restriction to the scripts executed in the sandbox (default unlimited)
 
