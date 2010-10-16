@@ -118,6 +118,8 @@ public
     @allowed_instances = Hash.new
     @allowed_methods = Array.new
     @allowed_klass_methods = Hash.new
+    @allowed_globals = Array.new
+    @allowed_consts = Array.new
   end
 
 private
@@ -286,6 +288,23 @@ public
     print e.backtrace.join("\n")
       false
     end
+  end
+
+
+  def global_allowed?(varname)
+    @allowed_globals.include? varname
+  end
+
+  def const_allowed?(varname)
+    @allowed_consts.include? varname
+  end
+
+  def allow_global( varname )
+    @allowed_globals << varname
+  end
+
+  def allow_const( varname )
+    @allowed_consts << varname
   end
 
 end

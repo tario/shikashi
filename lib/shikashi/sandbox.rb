@@ -171,6 +171,19 @@ module Shikashi
       attr_accessor :sandbox
       attr_accessor :redirect
 
+      def handle_gasgn( global_id, value )
+        source = caller[1].split(":").first
+
+        privileges = sandbox.privileges[source]
+        if privileges
+          unless privileges.global_allowed? global_id
+            raise SecurityError.new("Cannot assign global variable #{global_id}")
+          end
+        end
+
+        nil
+      end
+
       def handle_method(klass, recv, method_name)
         source = nil
 
