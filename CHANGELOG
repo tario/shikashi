@@ -1,6 +1,8 @@
-0.2.0	Removed rallhook dependency replaced by getsource
+0.2.0	Added control to the access to constants and global variables (See documentation)
 
-		Use of evalhook to hook the method calls in the place of rallhook
+		Remove rallhook dependency, replaced by getsource
+
+		Portability and stability improved by using  evalhook to hook the method calls in the place of rallhook
 
 		Added timeout restriction to the scripts executed in the sandbox (default unlimited)
 
