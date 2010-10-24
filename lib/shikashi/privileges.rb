@@ -295,9 +295,42 @@ public
     @allowed_consts.include? varname
   end
 
+  # defines the permissions needed to create or change a global variable
+  #
+  # Example:
+  #
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_method :print
+  #   priv.allow_global :$a
+  #
+  #   s.run(priv, '
+  #   $a = 9
+  #   print "assigned 9 to $a\n"
+  #   ')
+  #
+  #   p $a
+  #
   def allow_global( varname )
     @allowed_globals << varname
   end
+
+  # defines the permissions needed to create or change a const
+  #
+  # Example:
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_method :print
+  #   priv.allow_const "Object::A"
+  #
+  #   s.run(priv, '
+  #   print "assigned 8 to Object::A\n"
+  #   A = 8
+  #   ')
+  #
+  #   p A
 
   def allow_const( varname )
     @allowed_consts << varname

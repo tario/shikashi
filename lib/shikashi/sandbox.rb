@@ -132,7 +132,7 @@ module Shikashi
 #     print "called #{klass}#each block_given?:#{block_given?}, source: #{source}\n"
 #     if block_given?
 #      original_call(*args) do |*x|
-#  print "yielded value #{x.first}\n"
+#        print "yielded value #{x.first}\n"
 #        yield(*x)
 #      end
 #     else
