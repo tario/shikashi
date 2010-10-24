@@ -159,14 +159,50 @@ module Shikashi
 #  end
 # '
     class MethodWrapper
+
+      class MethodRedirect
+        include RedirectHelper::MethodRedirect
+
+        attr_accessor :klass
+        attr_accessor :method_name
+        attr_accessor :recv
+      end
+
+      attr_accessor :recv
+      attr_accessor :method_name
+      attr_accessor :klass
       attr_accessor :sandbox
       attr_accessor :privileges
       attr_accessor :source
 
       def self.redirect_handler(klass,recv,method_name,method_id,sandbox)
         mw = self.new
+        mw.klass = klass
+        mw.recv = recv
+        mw.method_name = method_name
         mw.sandbox = sandbox
-        mw
+
+        if block_given?
+          yield(mw)
+        end
+
+        mr = MethodRedirect.new
+
+        mr.recv = mw
+        mr.klass = mw.class
+        mr.method_name = :call
+
+        mr
+      end
+
+      def original_call(*args)
+        if block_given?
+          klass.instance_method(method_name).bind(recv).call(*args) do |*x|
+            yield(*x)
+          end
+        else
+          klass.instance_method(method_name).bind(recv).call(*args)
+        end
       end
     end
 
