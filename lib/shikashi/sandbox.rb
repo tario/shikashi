@@ -164,6 +164,9 @@ module Shikashi
       attr_accessor :source
 
       def self.redirect_handler(klass,recv,method_name,method_id,sandbox)
+        mw = self.new
+        mw.sandbox = sandbox
+        mw
       end
     end
 
