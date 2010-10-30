@@ -209,3 +209,7 @@ Simple redirection of method, the method foo is replaced by TestWrapper::call
 
 	s.run(perm,"sleep 3", :timeout => 2) # raise Shikashi::Timeout::Error after 2 seconds
 	
+	
+== Copying
+
+Copyright (c) 2010 Dario Seminara, released under the GPL License (see LICENSE)
