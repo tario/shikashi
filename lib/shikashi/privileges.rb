@@ -90,16 +90,16 @@ public
       @redirect_hash[method_name] = method_wrapper_class
     end
 
-    def handle_redirection(klass, recv, method_name, method_id, sandbox)
+    def handle_redirection(klass, recv, method_name, sandbox)
       rclass = @redirect_hash[method_name.to_sym]
 
       if rclass
         if block_given?
-          rclass.redirect_handler(klass, recv, method_name, method_id, sandbox) do |mh|
+          rclass.redirect_handler(klass, recv, method_name, 0, sandbox) do |mh|
             yield(mh)
           end
         else
-          rclass.redirect_handler(klass, recv, method_name, method_id, sandbox)
+          rclass.redirect_handler(klass, recv, method_name, 0, sandbox)
         end
       else
         nil
@@ -114,6 +114,8 @@ public
     @allowed_instances = Hash.new
     @allowed_methods = Array.new
     @allowed_klass_methods = Hash.new
+    @allowed_globals = Array.new
+    @allowed_consts = Array.new
   end
 
 private
@@ -189,15 +191,14 @@ public
     @allowed_methods << method_name
   end
 
-  def handle_redirection(klass, recv, method_name, method_id, sandbox)
+  def handle_redirection(klass, recv, method_name, sandbox)
     if @last_allowed
-
       if block_given?
-        @last_allowed.handle_redirection(klass, recv, method_name, method_id, sandbox) do |mh|
+        @last_allowed.handle_redirection(klass, recv, method_name, sandbox) do |mh|
           yield(mh)
         end
       else
-        @last_allowed.handle_redirection(klass, recv, method_name, method_id, sandbox)
+        @last_allowed.handle_redirection(klass, recv, method_name, sandbox)
       end
     else
       nil
@@ -208,7 +209,7 @@ public
   def allow?(klass, recv, method_name, method_id)
 
     m = nil
-    m = klass.shadow.instance_method(method_name) if method_name
+    m = klass.instance_method(method_name) if method_name
 
     begin
       return true if @allowed_methods.include?(method_name)
@@ -282,6 +283,56 @@ public
     print e.backtrace.join("\n")
       false
     end
+  end
+
+
+  def global_allowed?(varname)
+    @allowed_globals.include? varname
+  end
+
+  def const_allowed?(varname)
+    @allowed_consts.include? varname
+  end
+
+  # defines the permissions needed to create or change a global variable
+  #
+  # Example:
+  #
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_method :print
+  #   priv.allow_global :$a
+  #
+  #   s.run(priv, '
+  #   $a = 9
+  #   print "assigned 9 to $a\n"
+  #   ')
+  #
+  #   p $a
+  #
+  def allow_global( varname )
+    @allowed_globals << varname
+  end
+
+  # defines the permissions needed to create or change a const
+  #
+  # Example:
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_method :print
+  #   priv.allow_const "Object::A"
+  #
+  #   s.run(priv, '
+  #   print "assigned 8 to Object::A\n"
+  #   A = 8
+  #   ')
+  #
+  #   p A
+
+  def allow_const( varname )
+    @allowed_consts << varname
   end
 
 end

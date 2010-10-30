@@ -18,10 +18,12 @@ you should have received a copy of the gnu general public license
 along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 
 =end
-
-require "rallhook"
+require "rubygems"
+require "evalhook"
 require "shikashi/privileges"
 require "shikashi/pick_argument"
+require "getsource"
+require "timeout"
 
 module Shikashi
 
@@ -29,6 +31,14 @@ module Shikashi
     attr_accessor :global_binding
   end
 
+  module Timeout
+
+
+    #raised when reach the timeout in a script execution restricted by timeout (see Sandbox#run)
+    class Error < Exception
+
+    end
+  end
 
 #The sandbox class run the sandbox, because of internal behaviour only can be use one instance
 #of sandbox by thread (each different thread may have its own sandbox running in the same time)
@@ -119,9 +129,10 @@ module Shikashi
 #
 # class TestWrapper < Shikashi::Sandbox::MethodWrapper
 #   def call(*args)
-#     print "called each from source: #{source}\n"
+#     print "called #{klass}#each block_given?:#{block_given?}, source: #{source}\n"
 #     if block_given?
 #      original_call(*args) do |*x|
+#        print "yielded value #{x.first}\n"
 #        yield(*x)
 #      end
 #     else
@@ -132,8 +143,13 @@ module Shikashi
 #
 # s = Shikashi::Sandbox.new
 # perm = Shikashi::Privileges.new
+#
 # perm.instances_of(Array).allow :each
+# perm.instances_of(Array).redirect :each, TestWrapper
+#
 # perm.instances_of(Enumerable::Enumerator).allow :each
+# perm.instances_of(Enumerable::Enumerator).redirect :each, TestWrapper
+#
 # perm.allow_method :print
 #
 # s.run perm, '
@@ -148,64 +164,100 @@ module Shikashi
 #    print x,"\n"
 #  end
 # '
-    class MethodWrapper < RallHook::Helper::MethodWrapper
+    class MethodWrapper
+
+      class MethodRedirect
+        include RedirectHelper::MethodRedirect
+
+        attr_accessor :klass
+        attr_accessor :method_name
+        attr_accessor :recv
+      end
+
+      attr_accessor :recv
+      attr_accessor :method_name
+      attr_accessor :klass
       attr_accessor :sandbox
       attr_accessor :privileges
       attr_accessor :source
 
       def self.redirect_handler(klass,recv,method_name,method_id,sandbox)
-          wrap = self.new
-          wrap.klass = klass
-          wrap.recv = recv
-          wrap.method_name = method_name
-          wrap.method_id = method_id
-          wrap.sandbox = sandbox
+        mw = self.new
+        mw.klass = klass
+        mw.recv = recv
+        mw.method_name = method_name
+        mw.sandbox = sandbox
 
-          if block_given?
-            yield(wrap)
-          end
-
-          return wrap.redirect_with_unhook(:call_with_rehook)
-      end
-    end
-
-    # Used internally
-    class InheritedWrapper < MethodWrapper
-      def call(*args)
-        subclass = args.first
-        privileges.object(subclass).allow :new
-        privileges.instances_of(subclass).allow :initialize
-        original_call(*args)
-      end
-    end
-
-    # Used internally
-    class DummyWrapper < MethodWrapper
-      def call(*args)
         if block_given?
-          original_call(*args) do |*x|
+          yield(mw)
+        end
+
+        mr = MethodRedirect.new
+
+        mr.recv = mw
+        mr.klass = mw.class
+        mr.method_name = :call
+
+        mr
+      end
+
+      def original_call(*args)
+        if block_given?
+          klass.instance_method(method_name).bind(recv).call(*args) do |*x|
             yield(*x)
           end
         else
-          original_call(*args)
+          klass.instance_method(method_name).bind(recv).call(*args)
         end
       end
     end
 
-    class RallhookHandler < RallHook::HookHandler
+    class EvalhookHandler < EvalHook::HookHandler
       attr_accessor :sandbox
       attr_accessor :redirect
 
-      def handle_method(klass, recv, method_name, method_id)
+      def handle_gasgn( global_id, value )
+        source = caller[1].split(":").first
+
+        privileges = sandbox.privileges[source]
+        if privileges
+          unless privileges.global_allowed? global_id
+            raise SecurityError.new("Cannot assign global variable #{global_id}")
+          end
+        end
+
+        nil
+      end
+
+      def handle_cdecl(klass, const_id, value)
+        source = caller[1].split(":").first
+
+        privileges = sandbox.privileges[source]
+        if privileges
+          unless privileges.const_allowed? "#{klass}::#{const_id}"
+            raise SecurityError.new("Cannot assign const #{klass}::#{const_id}")
+          end
+        end
+
+        nil
+
+
+      end
+
+      def handle_method(klass, recv, method_name)
         source = nil
+
+        method_id = 0
+
         if method_name
 
-          source = caller.first.split(":").first
-          dest_source = klass.shadow.instance_method(method_name).body.file
+          source = caller[1].split(":").first
+          dest_source = klass.instance_method(method_name).body.file
 
           privileges = nil
           if source != dest_source then
             privileges = sandbox.privileges[source]
+
             if privileges then
               privileges = privileges.dup
               loop_source = source
@@ -229,12 +281,6 @@ module Shikashi
             end
           end
 
-          if method_name == :inherited and recv.instance_of? Class
-           mw = InheritedWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-           mw.recv.privileges = privileges
-    	     return mw
-          end
-
           return nil if method_name == :instance_eval
           return nil if method_name == :binding
 
@@ -245,20 +291,13 @@ module Shikashi
             end
           end
 
-          if dest_source == ""
-            return nil if (method_name.to_s == "core#define_method")
-            return nil if (method_name.to_s == "core#define_singleton_method")
-            return DummyWrapper.redirect_handler(klass,recv,method_name,method_id,sandbox)
-          end
-
         end
 
-
         if privileges
-          privileges.handle_redirection(klass,recv,method_name,method_id,sandbox) do |mh|
-              mh.privileges = privileges
-              mh.source = source
-            end
+          privileges.handle_redirection(klass,recv,method_name,sandbox) do |mh|
+            mh.privileges = privileges
+            mh.source = source
+          end
         end
 
       end # if
@@ -280,6 +319,8 @@ module Shikashi
     #             The default is a binding in the global context
     # :source     Optional argument to indicate the "source name", (visible in the backtraces). Only can
     #             be specified as hash parameter
+    # :timeout    Optional argument to restrict the execution time of the script to a given value in seconds
+    #             (accepts integer and decimal values), when timeout hits Shikashi::Timeout::Error is raised
     #
     #
     #The arguments can be passed in any order and using hash notation or not, examples:
@@ -331,26 +372,27 @@ module Shikashi
 
     def run(*args)
 
-      handler = RallhookHandler.new
+      handler = EvalhookHandler.new
       handler.redirect = @redirect_hash
       handler.sandbox = self
 
-      if block_given?
-        handler.hook do
-            yield
+      t = args.pick(:timeout) do nil end
+      raise Shikashi::Timeout::Error if t == 0
+      t = t || 0
+
+      begin
+        timeout t do
+          privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+          code = args.pick(String,:code)
+          binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
+          source = args.pick(:source) do generate_id end
+
+          self.privileges[source] = privileges_
+
+          handler.evalhook(code, binding_, source)
         end
-      else
-
-        privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
-        code = args.pick(String,:code)
-        binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
-        source = args.pick(:source) do generate_id end
-
-        self.privileges[source] = privileges_
-
-        handler.hook do
-          eval(code, binding_, source)
-        end
+      rescue ::Timeout::Error
+        raise Shikashi::Timeout::Error
       end
     end
 

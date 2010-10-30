@@ -1,3 +1,11 @@
+0.2.0	Added control to the access to constants and global variables (See documentation)
+
+		Remove rallhook dependency, replaced by getsource
+
+		Portability and stability improved by using  evalhook to hook the method calls in the place of rallhook
+
+		Added timeout restriction to the scripts executed in the sandbox (default unlimited)
+
 0.1.2	Fixed compatibility issues with ruby1.9
 
 0.1.1	Fixed issue 2: example2 failed when run under ruby1.9 (http://github.com/tario/shikashi/issues#issue/2)

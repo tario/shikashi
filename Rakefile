@@ -12,7 +12,8 @@ spec = Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.summary = 'shikashi is a ruby sandbox that permits the execution of "unprivileged" scripts by defining the permitted methods and constants the scripts can invoke (I.E., the script cannot use the File class or a RoR Model Class unless that permission is specified) "well done version" of ruby-arena-sanbox based on rallhook'
   s.homepage = "http://github.com/tario/shikashi"
-  s.add_dependency "rallhook", ">= 0.7.0"  
+  s.add_dependency "evalhook", ">= 0.1.0"
+  s.add_dependency "getsource", ">= 0.1.0"
   s.has_rdoc = true
   s.extra_rdoc_files = [ 'README' ]
 #  s.rdoc_options << '--main' << 'README'
@@ -25,7 +26,7 @@ task :default => [ :test ]
 
 Rake::TestTask.new('test') do |t|
   t.libs << 'test'
-  t.pattern = '{test}/test_*.rb'
+  t.pattern = '{test}/**/test_*.rb'
   t.verbose = true
 end
 
