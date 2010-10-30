@@ -13,10 +13,6 @@ The implementation of shikashi is pure ruby and it is based on rallhook, an amen
 
 == Installation
 
-=== Prerequisites
-
-* rallhook >= 0.7.0 (found at http://github.com/tario/rallhook)
-
 === Gem installation
 
 Run in the terminal:
