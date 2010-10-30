@@ -380,19 +380,23 @@ module Shikashi
       raise Shikashi::Timeout::Error if t == 0
       t = t || 0
 
-      begin
-        timeout t do
-          privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
-          code = args.pick(String,:code)
-          binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
-          source = args.pick(:source) do generate_id end
+      if block_given?
+        yield
+      else
+        begin
+          timeout t do
+            privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+            code = args.pick(String,:code)
+            binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
+            source = args.pick(:source) do generate_id end
 
-          self.privileges[source] = privileges_
+            self.privileges[source] = privileges_
 
-          handler.evalhook(code, binding_, source)
+            handler.evalhook(code, binding_, source)
+          end
+        rescue ::Timeout::Error
+          raise Shikashi::Timeout::Error
         end
-      rescue ::Timeout::Error
-        raise Shikashi::Timeout::Error
       end
     end
 
