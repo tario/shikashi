@@ -4,12 +4,10 @@ Shikashi is an sandbox for ruby that handles all ruby method calls executed in t
 these calls depending on the receiver object, the method name, the source file from where the call was originated
 and the source file where the called method is implemented.
 
-The permissions for each sandboxed run is fully configurable and the implementation of the methods called from
-the sandbox can be replaced transparently (i.e: replace method IO#write in the sandbox context to capture the
-standard output of the script)
+The permissions for each sandboxed run is fully configurable and the implementation of the methods called from within
+the sandbox can be replaced transparently
 
-The implementation of shikashi is pure ruby and it is based on rallhook, an amending of the ruby interpreter
-(see http://tario.github.com/rallhook/doc)
+The implementation of shikashi is written in pure ruby and now implemented based in evalhook, (see http://tario.github.com/evalhook)
 
 == Installation
 
