@@ -5,7 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Class: Shikashi::Sandbox::RallhookHandler</title>
+  <title>Class: Shikashi::Sandbox::EvalhookHandler</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <meta http-equiv="Content-Script-Type" content="text/javascript" />
   <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
@@ -50,7 +50,7 @@
         <table class="header-table">
         <tr class="top-aligned-row">
           <td><strong>Class</strong></td>
-          <td class="class-name-in-header">Shikashi::Sandbox::RallhookHandler</td>
+          <td class="class-name-in-header">Shikashi::Sandbox::EvalhookHandler</td>
         </tr>
         <tr class="top-aligned-row">
             <td><strong>In:</strong></td>
@@ -65,7 +65,7 @@
         <tr class="top-aligned-row">
             <td><strong>Parent:</strong></td>
             <td>
-                RallHook::HookHandler
+                EvalHook::HookHandler
             </td>
         </tr>
         </table>
@@ -86,7 +86,9 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000024">handle_method</a>&nbsp;&nbsp;
+      <a href="#M000029">handle_cdecl</a>&nbsp;&nbsp;
+      <a href="#M000028">handle_gasgn</a>&nbsp;&nbsp;
+      <a href="#M000030">handle_method</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -126,31 +128,101 @@
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000024" class="method-detail">
-        <a name="M000024"></a>
+      <div id="method-M000029" class="method-detail">
+        <a name="M000029"></a>
 
         <div class="method-heading">
-          <a href="#M000024" class="method-signature">
-          <span class="method-name">handle_method</span><span class="method-args">(klass, recv, method_name, method_id)</span>
+          <a href="#M000029" class="method-signature">
+          <span class="method-name">handle_cdecl</span><span class="method-args">(klass, const_id, value)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000024-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000024-source">
+            onclick="toggleCode('M000029-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000029-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 199</span>
-      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_method</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>, <span class="ruby-identifier">method_id</span>)
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 232</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_cdecl</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">const_id</span>, <span class="ruby-identifier">value</span>)
+        <span class="ruby-identifier">source</span> = <span class="ruby-identifier">caller</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;:&quot;</span>).<span class="ruby-identifier">first</span>
+
+        <span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">sandbox</span>.<span class="ruby-identifier">privileges</span>[<span class="ruby-identifier">source</span>]
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">privileges</span>
+          <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">privileges</span>.<span class="ruby-identifier">const_allowed?</span> <span class="ruby-node">&quot;#{klass}::#{const_id}&quot;</span>
+            <span class="ruby-identifier">raise</span> <span class="ruby-constant">SecurityError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;Cannot assign const #{klass}::#{const_id}&quot;</span>)
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-keyword kw">nil</span>
+
+
+      <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000028" class="method-detail">
+        <a name="M000028"></a>
+
+        <div class="method-heading">
+          <a href="#M000028" class="method-signature">
+          <span class="method-name">handle_gasgn</span><span class="method-args">( global_id, value )</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000028-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000028-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 219</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_gasgn</span>( <span class="ruby-identifier">global_id</span>, <span class="ruby-identifier">value</span> )
+        <span class="ruby-identifier">source</span> = <span class="ruby-identifier">caller</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;:&quot;</span>).<span class="ruby-identifier">first</span>
+
+        <span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">sandbox</span>.<span class="ruby-identifier">privileges</span>[<span class="ruby-identifier">source</span>]
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">privileges</span>
+          <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">privileges</span>.<span class="ruby-identifier">global_allowed?</span> <span class="ruby-identifier">global_id</span>
+            <span class="ruby-identifier">raise</span> <span class="ruby-constant">SecurityError</span>.<span class="ruby-identifier">new</span>(<span class="ruby-node">&quot;Cannot assign global variable #{global_id}&quot;</span>)
+          <span class="ruby-keyword kw">end</span>
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-keyword kw">nil</span>
+      <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000030" class="method-detail">
+        <a name="M000030"></a>
+
+        <div class="method-heading">
+          <a href="#M000030" class="method-signature">
+          <span class="method-name">handle_method</span><span class="method-args">(klass, recv, method_name)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000030-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000030-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 247</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_method</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>)
         <span class="ruby-identifier">source</span> = <span class="ruby-keyword kw">nil</span>
+
+        <span class="ruby-identifier">method_id</span> = <span class="ruby-value">0</span>
+
         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">method_name</span>
 
-          <span class="ruby-identifier">source</span> = <span class="ruby-identifier">caller</span>.<span class="ruby-identifier">first</span>.<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;:&quot;</span>).<span class="ruby-identifier">first</span>
-          <span class="ruby-identifier">dest_source</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">shadow</span>.<span class="ruby-identifier">instance_method</span>(<span class="ruby-identifier">method_name</span>).<span class="ruby-identifier">body</span>.<span class="ruby-identifier">file</span>
+          <span class="ruby-identifier">source</span> = <span class="ruby-identifier">caller</span>[<span class="ruby-value">1</span>].<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;:&quot;</span>).<span class="ruby-identifier">first</span>
+          <span class="ruby-identifier">dest_source</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">instance_method</span>(<span class="ruby-identifier">method_name</span>).<span class="ruby-identifier">body</span>.<span class="ruby-identifier">file</span>
 
           <span class="ruby-identifier">privileges</span> = <span class="ruby-keyword kw">nil</span>
           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">source</span> <span class="ruby-operator">!=</span> <span class="ruby-identifier">dest_source</span> <span class="ruby-keyword kw">then</span>
             <span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">sandbox</span>.<span class="ruby-identifier">privileges</span>[<span class="ruby-identifier">source</span>]
+
             <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">privileges</span> <span class="ruby-keyword kw">then</span>
               <span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">privileges</span>.<span class="ruby-identifier">dup</span>
               <span class="ruby-identifier">loop_source</span> = <span class="ruby-identifier">source</span>
@@ -174,12 +246,6 @@
             <span class="ruby-keyword kw">end</span>
           <span class="ruby-keyword kw">end</span>
 
-          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">method_name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:inherited</span> <span class="ruby-keyword kw">and</span> <span class="ruby-identifier">recv</span>.<span class="ruby-identifier">instance_of?</span> <span class="ruby-constant">Class</span>
-           <span class="ruby-identifier">mw</span> = <span class="ruby-constant">InheritedWrapper</span>.<span class="ruby-identifier">redirect_handler</span>(<span class="ruby-identifier">klass</span>,<span class="ruby-identifier">recv</span>,<span class="ruby-identifier">method_name</span>,<span class="ruby-identifier">method_id</span>,<span class="ruby-identifier">sandbox</span>)
-           <span class="ruby-identifier">mw</span>.<span class="ruby-identifier">recv</span>.<span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">privileges</span>
-             <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">mw</span>
-          <span class="ruby-keyword kw">end</span>
-
           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">method_name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:instance_eval</span>
           <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">method_name</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:binding</span>
 
@@ -190,18 +256,13 @@
             <span class="ruby-keyword kw">end</span>
           <span class="ruby-keyword kw">end</span>
 
-          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">dest_source</span> <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;&quot;</span>
-            <span class="ruby-keyword kw">return</span> <span class="ruby-constant">DummyWrapper</span>.<span class="ruby-identifier">redirect_handler</span>(<span class="ruby-identifier">klass</span>,<span class="ruby-identifier">recv</span>,<span class="ruby-identifier">method_name</span>,<span class="ruby-identifier">method_id</span>,<span class="ruby-identifier">sandbox</span>)
-          <span class="ruby-keyword kw">end</span>
-
         <span class="ruby-keyword kw">end</span>
 
-
         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">privileges</span>
-          <span class="ruby-identifier">privileges</span>.<span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>,<span class="ruby-identifier">recv</span>,<span class="ruby-identifier">method_id</span>,<span class="ruby-identifier">sandbox</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mh</span><span class="ruby-operator">|</span>
-              <span class="ruby-identifier">mh</span>.<span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">privileges</span>
-              <span class="ruby-identifier">mh</span>.<span class="ruby-identifier">source</span> = <span class="ruby-identifier">source</span>
-            <span class="ruby-keyword kw">end</span>
+          <span class="ruby-identifier">privileges</span>.<span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>,<span class="ruby-identifier">recv</span>,<span class="ruby-identifier">method_name</span>,<span class="ruby-identifier">sandbox</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mh</span><span class="ruby-operator">|</span>
+            <span class="ruby-identifier">mh</span>.<span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">privileges</span>
+            <span class="ruby-identifier">mh</span>.<span class="ruby-identifier">source</span> = <span class="ruby-identifier">source</span>
+          <span class="ruby-keyword kw">end</span>
         <span class="ruby-keyword kw">end</span>
 
       <span class="ruby-keyword kw">end</span>

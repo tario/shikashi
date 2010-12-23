@@ -65,7 +65,7 @@
         <tr class="top-aligned-row">
             <td><strong>Parent:</strong></td>
             <td>
-                RallHook::Helper::MethodWrapper
+                Object
             </td>
         </tr>
         </table>
@@ -124,9 +124,10 @@ Proper block handling on redirection wrapper
 
  class TestWrapper &lt; Shikashi::Sandbox::MethodWrapper
    def call(*args)
-     print &quot;called each from source: #{source}\n&quot;
+     print &quot;called #{klass}#each block_given?:#{block_given?}, source: #{source}\n&quot;
      if block_given?
       original_call(*args) do |*x|
+        print &quot;yielded value #{x.first}\n&quot;
         yield(*x)
       end
      else
@@ -137,8 +138,13 @@ Proper block handling on redirection wrapper
 
  s = Shikashi::Sandbox.new
  perm = Shikashi::Privileges.new
+
  perm.instances_of(Array).allow :each
+ perm.instances_of(Array).redirect :each, TestWrapper
+
  perm.instances_of(Enumerable::Enumerator).allow :each
+ perm.instances_of(Enumerable::Enumerator).redirect :each, TestWrapper
+
  perm.allow_method :print
 
  s.run perm, '
@@ -164,7 +170,8 @@ Proper block handling on redirection wrapper
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000027">redirect_handler</a>&nbsp;&nbsp;
+      <a href="#M000032">original_call</a>&nbsp;&nbsp;
+      <a href="#M000031">redirect_handler</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -175,6 +182,12 @@ Proper block handling on redirection wrapper
 
     <div id="section">
 
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Class <a href="MethodWrapper/MethodRedirect.html" class="link">Shikashi::Sandbox::MethodWrapper::MethodRedirect</a><br />
+
+    </div>
 
 
 
@@ -185,7 +198,22 @@ Proper block handling on redirection wrapper
       <div class="name-list">
         <table>
         <tr class="top-aligned-row context-row">
+          <td class="context-item-name">klass</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">method_name</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
           <td class="context-item-name">privileges</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">recv</td>
           <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
           <td class="context-item-desc"></td>
         </tr>
@@ -209,34 +237,70 @@ Proper block handling on redirection wrapper
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000027" class="method-detail">
-        <a name="M000027"></a>
+      <div id="method-M000031" class="method-detail">
+        <a name="M000031"></a>
 
         <div class="method-heading">
-          <a href="#M000027" class="method-signature">
-          <span class="method-name">redirect_handler</span><span class="method-args">(klass,recv,method_name,method_id,sandbox) {|wrap| ...}</span>
+          <a href="#M000031" class="method-signature">
+          <span class="method-name">redirect_handler</span><span class="method-args">(klass,recv,method_name,method_id,sandbox) {|mw| ...}</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000027-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000027-source">
+            onclick="toggleCode('M000031-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000031-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 156</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 184</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">redirect_handler</span>(<span class="ruby-identifier">klass</span>,<span class="ruby-identifier">recv</span>,<span class="ruby-identifier">method_name</span>,<span class="ruby-identifier">method_id</span>,<span class="ruby-identifier">sandbox</span>)
-          <span class="ruby-identifier">wrap</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">new</span>
-          <span class="ruby-identifier">wrap</span>.<span class="ruby-identifier">klass</span> = <span class="ruby-identifier">klass</span>
-          <span class="ruby-identifier">wrap</span>.<span class="ruby-identifier">recv</span> = <span class="ruby-identifier">recv</span>
-          <span class="ruby-identifier">wrap</span>.<span class="ruby-identifier">method_name</span> = <span class="ruby-identifier">method_name</span>
-          <span class="ruby-identifier">wrap</span>.<span class="ruby-identifier">method_id</span> = <span class="ruby-identifier">method_id</span>
-          <span class="ruby-identifier">wrap</span>.<span class="ruby-identifier">sandbox</span> = <span class="ruby-identifier">sandbox</span>
+        <span class="ruby-identifier">mw</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">new</span>
+        <span class="ruby-identifier">mw</span>.<span class="ruby-identifier">klass</span> = <span class="ruby-identifier">klass</span>
+        <span class="ruby-identifier">mw</span>.<span class="ruby-identifier">recv</span> = <span class="ruby-identifier">recv</span>
+        <span class="ruby-identifier">mw</span>.<span class="ruby-identifier">method_name</span> = <span class="ruby-identifier">method_name</span>
+        <span class="ruby-identifier">mw</span>.<span class="ruby-identifier">sandbox</span> = <span class="ruby-identifier">sandbox</span>
 
-          <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
-            <span class="ruby-keyword kw">yield</span>(<span class="ruby-identifier">wrap</span>)
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+          <span class="ruby-keyword kw">yield</span>(<span class="ruby-identifier">mw</span>)
+        <span class="ruby-keyword kw">end</span>
+
+        <span class="ruby-identifier">mr</span> = <span class="ruby-constant">MethodRedirect</span>.<span class="ruby-identifier">new</span>
+
+        <span class="ruby-identifier">mr</span>.<span class="ruby-identifier">recv</span> = <span class="ruby-identifier">mw</span>
+        <span class="ruby-identifier">mr</span>.<span class="ruby-identifier">klass</span> = <span class="ruby-identifier">mw</span>.<span class="ruby-identifier">class</span>
+        <span class="ruby-identifier">mr</span>.<span class="ruby-identifier">method_name</span> = <span class="ruby-identifier">:call</span>
+
+        <span class="ruby-identifier">mr</span>
+      <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000032" class="method-detail">
+        <a name="M000032"></a>
+
+        <div class="method-heading">
+          <a href="#M000032" class="method-signature">
+          <span class="method-name">original_call</span><span class="method-args">(*args) {|*x| ...}</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000032-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000032-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 204</span>
+      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">original_call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+        <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+          <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">instance_method</span>(<span class="ruby-identifier">method_name</span>).<span class="ruby-identifier">bind</span>(<span class="ruby-identifier">recv</span>).<span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-operator">*</span><span class="ruby-identifier">x</span><span class="ruby-operator">|</span>
+            <span class="ruby-keyword kw">yield</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">x</span>)
           <span class="ruby-keyword kw">end</span>
-
-          <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">wrap</span>.<span class="ruby-identifier">redirect_with_unhook</span>(<span class="ruby-identifier">:call_with_rehook</span>)
+        <span class="ruby-keyword kw">else</span>
+          <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">instance_method</span>(<span class="ruby-identifier">method_name</span>).<span class="ruby-identifier">bind</span>(<span class="ruby-identifier">recv</span>).<span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+        <span class="ruby-keyword kw">end</span>
       <span class="ruby-keyword kw">end</span>
 </pre>
           </div>

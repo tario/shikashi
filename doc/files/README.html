@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Sun Jun 20 14:50:37 -0300 2010</td>
+      <td>Thu Dec 23 19:08:13 -0300 2010</td>
     </tr>
     </table>
   </div>
@@ -79,24 +79,25 @@ called method is implemented.
 </p>
 <p>
 The permissions for each sandboxed run is fully configurable and the
-implementation of the methods called from the sandbox can be replaced
-transparently (i.e: replace method IO#write in the sandbox context to
-capture the standard output of the script)
+implementation of the methods called from within the sandbox can be
+replaced transparently
 </p>
 <p>
-The implementation of shikashi is pure ruby and it is based on rallhook, an
-amending of the ruby interpreter (see <a
-href="http://tario.github.com/rallhook/doc">tario.github.com/rallhook/doc</a>)
+The implementation of shikashi is written in pure ruby and now implemented
+based in evalhook, (see <a
+href="http://tario.github.com/evalhook">tario.github.com/evalhook</a>)
 </p>
 <h2>Installation</h2>
-<h3>Prerequisites</h3>
-<ul>
-<li>rallhook &gt;= 0.7.0 (found at <a
-href="http://github.com/tario/rallhook">github.com/tario/rallhook</a>)
-
-</li>
-</ul>
 <h3>Gem installation</h3>
+<p>
+Run in the terminal:
+</p>
+<p>
+sudo gem install shikashi
+</p>
+<p>
+OR
+</p>
 <ul>
 <li>Download the last version of the gem from <a
 href="http://github.com/tario/shikashi/downloads">github.com/tario/shikashi/downloads</a>
@@ -107,7 +108,7 @@ href="http://github.com/tario/shikashi/downloads">github.com/tario/shikashi/down
 </li>
 </ul>
 <p>
-gem install shikashi-X.X.X.gem.
+sudo gem install shikashi-X.X.X.gem.
 </p>
 <h2>Documentation</h2>
 <p>
@@ -287,6 +288,23 @@ TestWrapper::call
 
         s.run(perm,&quot;X.new.foo&quot;)
 </pre>
+<h3>Timeout example</h3>
+<pre>
+        require &quot;rubygems&quot;
+        require &quot;shikashi&quot;
+
+        s = Shikashi::Sandbox.new
+        perm = Shikashi::Privileges.new
+
+        perm.allow_method :sleep
+
+        s.run(perm,&quot;sleep 3&quot;, :timeout =&gt; 2) # raise Shikashi::Timeout::Error after 2 seconds
+</pre>
+<h2>Copying</h2>
+<p>
+Copyright (c) 2010 Dario Seminara, released under the GPL License (see
+LICENSE)
+</p>
 
     </div>
 

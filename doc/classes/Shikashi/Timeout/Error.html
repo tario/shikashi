@@ -5,7 +5,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
-  <title>Class: Shikashi::Sandbox::InheritedWrapper</title>
+  <title>Class: Shikashi::Timeout::Error</title>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
   <meta http-equiv="Content-Script-Type" content="text/javascript" />
   <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
@@ -50,7 +50,7 @@
         <table class="header-table">
         <tr class="top-aligned-row">
           <td><strong>Class</strong></td>
-          <td class="class-name-in-header">Shikashi::Sandbox::InheritedWrapper</td>
+          <td class="class-name-in-header">Shikashi::Timeout::Error</td>
         </tr>
         <tr class="top-aligned-row">
             <td><strong>In:</strong></td>
@@ -65,9 +65,7 @@
         <tr class="top-aligned-row">
             <td><strong>Parent:</strong></td>
             <td>
-                <a href="MethodWrapper.html">
-                MethodWrapper
-               </a>
+                Exception
             </td>
         </tr>
         </table>
@@ -82,7 +80,8 @@
 
     <div id="description">
       <p>
-Used internally
+raised when reach the timeout in a script execution restricted by timeout
+(see <a href="../Sandbox.html#M000026">Sandbox#run</a>)
 </p>
 
     </div>
@@ -90,13 +89,6 @@ Used internally
 
    </div>
 
-    <div id="method-list">
-      <h3 class="section-bar">Methods</h3>
-
-      <div class="name-list">
-      <a href="#M000026">call</a>&nbsp;&nbsp;
-      </div>
-    </div>
 
   </div>
 
@@ -113,37 +105,6 @@ Used internally
 
 
     <!-- if method_list -->
-    <div id="methods">
-      <h3 class="section-bar">Public Instance methods</h3>
-
-      <div id="method-M000026" class="method-detail">
-        <a name="M000026"></a>
-
-        <div class="method-heading">
-          <a href="#M000026" class="method-signature">
-          <span class="method-name">call</span><span class="method-args">(*args)</span>
-          </a>
-        </div>
-      
-        <div class="method-description">
-          <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000026-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000026-source">
-<pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 174</span>
-      <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-        <span class="ruby-identifier">subclass</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">first</span>
-        <span class="ruby-identifier">privileges</span>.<span class="ruby-identifier">object</span>(<span class="ruby-identifier">subclass</span>).<span class="ruby-identifier">allow</span> <span class="ruby-identifier">:new</span>
-        <span class="ruby-identifier">privileges</span>.<span class="ruby-identifier">instances_of</span>(<span class="ruby-identifier">subclass</span>).<span class="ruby-identifier">allow</span> <span class="ruby-identifier">:initialize</span>
-        <span class="ruby-identifier">original_call</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-      <span class="ruby-keyword kw">end</span>
-</pre>
-          </div>
-        </div>
-      </div>
-
-
-    </div>
 
 
   </div>

@@ -107,9 +107,13 @@ about methods and objects
       <div class="name-list">
       <a href="#M000012">allow?</a>&nbsp;&nbsp;
       <a href="#M000005">allow_class_definitions</a>&nbsp;&nbsp;
+      <a href="#M000016">allow_const</a>&nbsp;&nbsp;
       <a href="#M000003">allow_exceptions</a>&nbsp;&nbsp;
+      <a href="#M000015">allow_global</a>&nbsp;&nbsp;
       <a href="#M000010">allow_method</a>&nbsp;&nbsp;
       <a href="#M000004">allow_singleton_methods</a>&nbsp;&nbsp;
+      <a href="#M000014">const_allowed?</a>&nbsp;&nbsp;
+      <a href="#M000013">global_allowed?</a>&nbsp;&nbsp;
       <a href="#M000011">handle_redirection</a>&nbsp;&nbsp;
       <a href="#M000008">instances_of</a>&nbsp;&nbsp;
       <a href="#M000009">methods_of</a>&nbsp;&nbsp;
@@ -156,7 +160,7 @@ about methods and objects
             onclick="toggleCode('M000006-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000006-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 114</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 110</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
     <span class="ruby-ivar">@allowed_objects</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
     <span class="ruby-ivar">@allowed_kinds</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
@@ -164,6 +168,8 @@ about methods and objects
     <span class="ruby-ivar">@allowed_instances</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
     <span class="ruby-ivar">@allowed_methods</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>
     <span class="ruby-ivar">@allowed_klass_methods</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-ivar">@allowed_globals</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>
+    <span class="ruby-ivar">@allowed_consts</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>
   <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
@@ -186,11 +192,11 @@ about methods and objects
             onclick="toggleCode('M000012-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000012-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 212</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 209</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow?</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>, <span class="ruby-identifier">method_id</span>)
 
     <span class="ruby-identifier">m</span> = <span class="ruby-keyword kw">nil</span>
-    <span class="ruby-identifier">m</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">shadow</span>.<span class="ruby-identifier">instance_method</span>(<span class="ruby-identifier">method_name</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">method_name</span>
+    <span class="ruby-identifier">m</span> = <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">instance_method</span>(<span class="ruby-identifier">method_name</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">method_name</span>
 
     <span class="ruby-keyword kw">begin</span>
       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span> <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@allowed_methods</span>.<span class="ruby-identifier">include?</span>(<span class="ruby-identifier">method_name</span>)
@@ -290,7 +296,51 @@ Defines the permissions needed to declare classes within the sandbox
 <span class="ruby-comment cmt"># File lib/shikashi/privileges/classes.rb, line 24</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow_class_definitions</span>
       <span class="ruby-identifier">instances_of</span>(<span class="ruby-constant">Class</span>).<span class="ruby-identifier">allow</span> <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">:inherited</span>, <span class="ruby-identifier">:method_added</span>
+      <span class="ruby-identifier">allow_method</span> <span class="ruby-value str">&quot;core#define_method&quot;</span>.<span class="ruby-identifier">to_sym</span>
     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000016" class="method-detail">
+        <a name="M000016"></a>
+
+        <div class="method-heading">
+          <a href="#M000016" class="method-signature">
+          <span class="method-name">allow_const</span><span class="method-args">( varname )</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+defines the permissions needed to create or change a const
+</p>
+<p>
+Example:
+</p>
+<pre>
+  s = Sandbox.new
+  priv = Privileges.new
+
+  priv.allow_method :print
+  priv.allow_const &quot;Object::A&quot;
+
+  s.run(priv, '
+  print &quot;assigned 8 to Object::A\n&quot;
+  A = 8
+  ')
+
+  p A
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000016-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000016-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 334</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow_const</span>( <span class="ruby-identifier">varname</span> )
+    <span class="ruby-ivar">@allowed_consts</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">varname</span>
+  <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -323,6 +373,49 @@ Define the permissions needed to raise exceptions within the sandbox
         </div>
       </div>
 
+      <div id="method-M000015" class="method-detail">
+        <a name="M000015"></a>
+
+        <div class="method-heading">
+          <a href="#M000015" class="method-signature">
+          <span class="method-name">allow_global</span><span class="method-args">( varname )</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+defines the permissions needed to create or change a global variable
+</p>
+<p>
+Example:
+</p>
+<pre>
+  s = Sandbox.new
+  priv = Privileges.new
+
+  priv.allow_method :print
+  priv.allow_global :$a
+
+  s.run(priv, '
+  $a = 9
+  print &quot;assigned 9 to $a\n&quot;
+  ')
+
+  p $a
+</pre>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000015-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000015-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 314</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow_global</span>( <span class="ruby-identifier">varname</span> )
+    <span class="ruby-ivar">@allowed_globals</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">varname</span>
+  <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
       <div id="method-M000010" class="method-detail">
         <a name="M000010"></a>
 
@@ -346,7 +439,7 @@ Example:
             onclick="toggleCode('M000010-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000010-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 192</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 190</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow_method</span>(<span class="ruby-identifier">method_name</span>)
     <span class="ruby-ivar">@allowed_methods</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">method_name</span>
   <span class="ruby-keyword kw">end</span>
@@ -376,7 +469,54 @@ sandbox
 <span class="ruby-comment cmt"># File lib/shikashi/privileges/singleton_methods.rb, line 24</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow_singleton_methods</span>
       <span class="ruby-identifier">allow_method</span> <span class="ruby-identifier">:singleton_method_added</span>
+      <span class="ruby-identifier">allow_method</span> <span class="ruby-value str">&quot;core#define_singleton_method&quot;</span>.<span class="ruby-identifier">to_sym</span>
     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000014" class="method-detail">
+        <a name="M000014"></a>
+
+        <div class="method-heading">
+          <a href="#M000014" class="method-signature">
+          <span class="method-name">const_allowed?</span><span class="method-args">(varname)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000014-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000014-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 293</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">const_allowed?</span>(<span class="ruby-identifier">varname</span>)
+    <span class="ruby-ivar">@allowed_consts</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">varname</span>
+  <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000013" class="method-detail">
+        <a name="M000013"></a>
+
+        <div class="method-heading">
+          <a href="#M000013" class="method-signature">
+          <span class="method-name">global_allowed?</span><span class="method-args">(varname)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000013-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000013-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 289</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">global_allowed?</span>(<span class="ruby-identifier">varname</span>)
+    <span class="ruby-ivar">@allowed_globals</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">varname</span>
+  <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
@@ -387,7 +527,7 @@ sandbox
 
         <div class="method-heading">
           <a href="#M000011" class="method-signature">
-          <span class="method-name">handle_redirection</span><span class="method-args">(klass, recv, method_id, sandbox) {|mh| ...}</span>
+          <span class="method-name">handle_redirection</span><span class="method-args">(klass, recv, method_name, sandbox) {|mh| ...}</span>
           </a>
         </div>
       
@@ -396,16 +536,15 @@ sandbox
             onclick="toggleCode('M000011-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000011-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 196</span>
-  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_id</span>, <span class="ruby-identifier">sandbox</span>)
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 194</span>
+  <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>, <span class="ruby-identifier">sandbox</span>)
     <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@last_allowed</span>
-
       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
-        <span class="ruby-ivar">@last_allowed</span>.<span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_id</span>, <span class="ruby-identifier">sandbox</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mh</span><span class="ruby-operator">|</span>
+        <span class="ruby-ivar">@last_allowed</span>.<span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>, <span class="ruby-identifier">sandbox</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mh</span><span class="ruby-operator">|</span>
           <span class="ruby-keyword kw">yield</span>(<span class="ruby-identifier">mh</span>)
         <span class="ruby-keyword kw">end</span>
       <span class="ruby-keyword kw">else</span>
-        <span class="ruby-ivar">@last_allowed</span>.<span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_id</span>, <span class="ruby-identifier">sandbox</span>)
+        <span class="ruby-ivar">@last_allowed</span>.<span class="ruby-identifier">handle_redirection</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>, <span class="ruby-identifier">sandbox</span>)
       <span class="ruby-keyword kw">end</span>
     <span class="ruby-keyword kw">else</span>
       <span class="ruby-keyword kw">nil</span>
@@ -452,7 +591,7 @@ Example 3:
             onclick="toggleCode('M000008-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000008-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 157</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 155</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">instances_of</span>(<span class="ruby-identifier">klass</span>)
     <span class="ruby-identifier">hash_entry</span>(<span class="ruby-ivar">@allowed_instances</span>, <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">object_id</span>)
   <span class="ruby-keyword kw">end</span>
@@ -499,7 +638,7 @@ Example 1:
             onclick="toggleCode('M000009-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000009-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 182</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 180</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">methods_of</span>(<span class="ruby-identifier">klass</span>)
     <span class="ruby-identifier">hash_entry</span>(<span class="ruby-ivar">@allowed_klass_methods</span>, <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">object_id</span>)
   <span class="ruby-keyword kw">end</span>
@@ -532,7 +671,7 @@ Example 1:
             onclick="toggleCode('M000007-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000007-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 141</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 139</span>
   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">object</span>(<span class="ruby-identifier">obj</span>)
     <span class="ruby-identifier">hash_entry</span>(<span class="ruby-ivar">@allowed_objects</span>, <span class="ruby-identifier">obj</span>.<span class="ruby-identifier">object_id</span>)
   <span class="ruby-keyword kw">end</span>
