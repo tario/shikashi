@@ -390,6 +390,10 @@ module Shikashi
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
 
+            if (code.include? "`")
+              raise SecurityError
+            end
+
             self.privileges[source] = privileges_
 
             handler.evalhook(code, binding_, source)
