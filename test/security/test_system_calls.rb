@@ -2,7 +2,7 @@
 
 Authors:
 
-	Stellard (https://github.com/stellard)
+	Scott Ellard 	(scott.ellard@gmail.com)
 
 This file is part of the shikashi project, http://github.com/tario/shikashi
 
