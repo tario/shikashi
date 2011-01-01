@@ -259,7 +259,7 @@ module Shikashi
             privileges = sandbox.privileges[source]
 
             if privileges then
-              privileges = privileges.dup
+#              privileges = privileges.dup
               loop_source = source
               loop_privileges = privileges
 
