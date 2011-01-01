@@ -52,4 +52,17 @@ describe Sandbox, "Shikashi sandbox" do
     ).should be == A::B::C
   end
 
+  it "should change base namespace when classes are declared" do
+    Sandbox.new.run( "
+                class ::X
+                   def foo
+                   end
+                end
+            ",
+        :base_namespace => A::B
+    )
+
+    A::B::X
+  end
+
 end
