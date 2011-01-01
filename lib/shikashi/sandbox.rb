@@ -240,8 +240,6 @@ module Shikashi
         end
 
         nil
-
-
       end
 
       def handle_method(klass, recv, method_name)
