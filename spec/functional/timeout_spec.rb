@@ -21,28 +21,29 @@ along with shikashi.  if not, see <http://www.gnu.org/licenses/>.
 require "test/unit"
 require "shikashi"
 
-class TimeoutTest <  Test::Unit::TestCase
+include Shikashi
 
-  def _test_timeout(execution_delay, timeout)
-    priv = Shikashi::Privileges.new
-    # allow the execution of the method sleep to emulate an execution delay
-    priv.allow_method :sleep
-
-    if execution_delay > timeout
-      assert_raise Shikashi::Timeout::Error do
-        # specify the timeout and the current binding to use the execution_delay parameter
-        Shikashi::Sandbox.new.run("sleep execution_delay", priv, binding, :timeout => timeout)
-      end
-    else
-      assert_nothing_raised do
-        Shikashi::Sandbox.new.run("sleep execution_delay", priv, binding, :timeout => timeout)
-      end
-    end
-  end
+describe Sandbox, "Shikashi sandbox" do
 
   def self.add_test(name, execution_delay, timeout)
-    define_method("test_"+name)  do
-      _test_timeout(execution_delay, timeout)
+    if execution_delay > timeout
+      it "Should allow timeout of type #{name}" do
+        priv = Shikashi::Privileges.new
+        priv.allow_method :sleep
+
+        lambda {
+        Sandbox.new.run "sleep #{execution_delay}", priv, :timeout => timeout
+        }.should raise_error(Shikashi::Timeout::Error)
+      end
+    else
+      it "Should allow timeout of type #{name}" do
+        priv = Shikashi::Privileges.new
+        priv.allow_method :sleep
+
+        Sandbox.new.run "sleep #{execution_delay}", priv, :timeout => timeout
+
+      end
+
     end
   end
 
