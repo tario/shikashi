@@ -67,6 +67,8 @@ module Shikashi
 #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
     attr_reader :chain
 
+
+    attr_reader :base_namespace
 #
 # Generate a random source file name for the sandbox, used internally
 #
@@ -215,6 +217,10 @@ module Shikashi
     class EvalhookHandler < EvalHook::HookHandler
       attr_accessor :sandbox
       attr_accessor :redirect
+
+      def handle_colon3(symbol)
+        eval("sandbox.base_namespace::#{symbol}")
+      end
 
       def handle_gasgn( global_id, value )
         source = caller[1].split(":").first
@@ -387,6 +393,7 @@ module Shikashi
             code = args.pick(String,:code)
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
+            @base_namespace = args.pick(:base_namespace) do Object end
 
             return nil if (code == "")
 
