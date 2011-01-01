@@ -26,34 +26,34 @@ require "test/unit"
 require "rubygems"
 require "shikashi"
 
-class SystemCalls < Test::Unit::TestCase
-  
-  def test_backtick_call_should_raise_error
+describe Shikashi::Sandbox, "Shikashi sandbox" do
+
+  it "should raise SecurityError when try to run shell cmd with backsticks" do
     priv = Shikashi::Privileges.new
-    assert_raise SecurityError do
+    lambda {
       Shikashi::Sandbox.new.run("`ls`", priv)
-    end
+    }.should raise_error(SecurityError)
   end
-  
-  def test_percent_x_call_should_raise_error
+
+  it "should raise SecurityError when try to run shell cmd with percent" do
     priv = Shikashi::Privileges.new
-    assert_raise SecurityError do
+    lambda {
       Shikashi::Sandbox.new.run("%x[ls]", priv)
-    end
+    }.should raise_error(SecurityError)
   end
-  
-  def test_system_call_should_raise_error
+
+  it "should raise SecurityError when try to run shell cmd by calling system method" do
     priv = Shikashi::Privileges.new
-    assert_raise SecurityError do
+    lambda {
       Shikashi::Sandbox.new.run("system('ls')", priv)
-    end
+    }.should raise_error(SecurityError)
   end
-  
-  def test_exec_call_should_raise_error
+
+  it "should raise SecurityError when try to run shell cmd by calling exec method" do
     priv = Shikashi::Privileges.new
-    assert_raise SecurityError do
+    lambda {
       Shikashi::Sandbox.new.run("exec('ls')", priv)
-    end
+    }.should raise_error(SecurityError)
   end
 
 end
