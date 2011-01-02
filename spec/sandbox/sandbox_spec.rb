@@ -38,4 +38,31 @@ describe Sandbox, "Shikashi sandbox" do
 
   end
 
+  module A
+    module B
+      module C
+
+      end
+    end
+  end
+
+  it "should use base namespace when the code uses colon3 node" do
+    Sandbox.new.run( "::C",
+        :base_namespace => A::B
+    ).should be == A::B::C
+  end
+
+  it "should change base namespace when classes are declared" do
+    Sandbox.new.run( "
+                class ::X
+                   def foo
+                   end
+                end
+            ",
+        :base_namespace => A::B
+    )
+
+    A::B::X
+  end
+
 end
