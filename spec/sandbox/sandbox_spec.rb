@@ -38,6 +38,7 @@ describe Sandbox, "Shikashi sandbox" do
 
   end
 
+
   module A
     module B
       module C
@@ -46,13 +47,33 @@ describe Sandbox, "Shikashi sandbox" do
     end
   end
 
-  it "should use base namespace when the code uses colon3 node" do
+
+  it "should use base namespace when the code uses colon3 node (2 levels)" do
+    Sandbox.new.run( "::B",
+        :base_namespace => A
+    ).should be == A::B
+  end
+
+  it "should change base namespace when classes are declared (2 levels)" do
+    Sandbox.new.run( "
+                class ::X
+                   def foo
+                   end
+                end
+            ",
+        :base_namespace => A
+    )
+
+    A::X
+  end
+
+  it "should use base namespace when the code uses colon3 node (3 levels)" do
     Sandbox.new.run( "::C",
         :base_namespace => A::B
     ).should be == A::B::C
   end
 
-  it "should change base namespace when classes are declared" do
+  it "should change base namespace when classes are declared (3 levels)" do
     Sandbox.new.run( "
                 class ::X
                    def foo
