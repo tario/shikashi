@@ -393,7 +393,7 @@ module Shikashi
             source = args.pick(:source) do generate_id end
             handler.base_namespace = args.pick(:base_namespace) do Object end
 
-            return nil if (code == "")
+            code = "nil;\n " + code
 
             self.privileges[source] = privileges_
 
