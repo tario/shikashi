@@ -78,7 +78,6 @@ module Shikashi
     def initialize
       @privileges = Hash.new
       @chain = Hash.new
-      @redirect_hash = Hash.new
     end
 
 # add a chain of sources, used internally
@@ -86,135 +85,8 @@ module Shikashi
       @chain[inner] = outer
     end
 
-
-#Base class to define redirections of methods called in the sandbox
-#
-#= Example 1
-#Basic redirection
-#
-# require "rubygems"
-# require "shikashi"
-#
-# class TestWrapper < Shikashi::Sandbox::MethodWrapper
-#   def call(*args)
-#     print "called foo from source: #{source}, arguments: #{args.inspect} \n"
-#     original_call(*args)
-#   end
-# end
-#
-#
-# class X
-#   def foo
-#     print "original foo\n"
-#   end
-# end
-#
-#
-# s = Shikashi::Sandbox.new
-# perm = Shikashi::Privileges.new
-#
-# perm.object(X).allow :new
-# perm.instances_of(X).allow :foo
-#
-# # redirect calls to foo to TestWrapper
-# perm.instances_of(X).redirect :foo, TestWrapper
-#
-# s.run(perm,"X.new.foo")
-#
-#= Example 2
-#Proper block handling on redirection wrapper
-#
-# require "rubygems"
-# require "shikashi"
-#
-# class TestWrapper < Shikashi::Sandbox::MethodWrapper
-#   def call(*args)
-#     print "called #{klass}#each block_given?:#{block_given?}, source: #{source}\n"
-#     if block_given?
-#      original_call(*args) do |*x|
-#        print "yielded value #{x.first}\n"
-#        yield(*x)
-#      end
-#     else
-#      original_call(*args)
-#     end
-#   end
-# end
-#
-# s = Shikashi::Sandbox.new
-# perm = Shikashi::Privileges.new
-#
-# perm.instances_of(Array).allow :each
-# perm.instances_of(Array).redirect :each, TestWrapper
-#
-# perm.instances_of(Enumerable::Enumerator).allow :each
-# perm.instances_of(Enumerable::Enumerator).redirect :each, TestWrapper
-#
-# perm.allow_method :print
-#
-# s.run perm, '
-#  array = [1,2,3]
-#
-#  array.each do |x|
-#    print x,"\n"
-#  end
-#
-#  enum = array.each
-#  enum.each do |x|
-#    print x,"\n"
-#  end
-# '
-    class MethodWrapper
-
-      class MethodRedirect
-        include RedirectHelper::MethodRedirect
-
-        attr_accessor :klass
-        attr_accessor :method_name
-        attr_accessor :recv
-      end
-
-      attr_accessor :recv
-      attr_accessor :method_name
-      attr_accessor :klass
-      attr_accessor :sandbox
-      attr_accessor :privileges
-      attr_accessor :source
-
-      def self.redirect_handler(klass,recv,method_name,method_id,sandbox)
-        mw = self.new
-        mw.klass = klass
-        mw.recv = recv
-        mw.method_name = method_name
-        mw.sandbox = sandbox
-
-        if block_given?
-          yield(mw)
-        end
-
-        mr = MethodRedirect.new
-
-        mr.recv = mw
-        mr.klass = mw.class
-        mr.method_name = :call
-
-        mr
-      end
-
-      def original_call(*args)
-        if block_given?
-          klass.instance_method(method_name).bind(recv).call(*args) do |*x|
-            yield(*x)
-          end
-        else
-          klass.instance_method(method_name).bind(recv).call(*args)
-        end
-      end
-    end
-
     class EvalhookHandler < EvalHook::HookHandler
       attr_accessor :sandbox
-      attr_accessor :redirect
 
       def handle_xstr( str )
         raise SecurityError, "fobidden shell commands"
@@ -286,21 +158,10 @@ module Shikashi
           return nil if method_name == :instance_eval
           return nil if method_name == :binding
 
-          if method_name
-            wclass = @redirect[method_name.to_sym]
-            if wclass then
-              return wclass.redirect_handler(klass,recv,method_name,method_id,sandbox)
-            end
-          end
+          nil
 
         end
 
-        if privileges
-          privileges.handle_redirection(klass,recv,method_name,sandbox) do |mh|
-            mh.privileges = privileges
-            mh.source = source
-          end
-        end
 
       end # if
     end # Class
@@ -375,7 +236,6 @@ module Shikashi
     def run(*args)
 
       handler = EvalhookHandler.new
-      handler.redirect = @redirect_hash
       handler.sandbox = self
 
       t = args.pick(:timeout) do nil end
