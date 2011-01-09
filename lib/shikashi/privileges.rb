@@ -85,26 +85,6 @@ public
       @all = true
     end
 
-    def redirect(method_name, method_wrapper_class)
-      allow method_name
-      @redirect_hash[method_name] = method_wrapper_class
-    end
-
-    def handle_redirection(klass, recv, method_name, sandbox)
-      rclass = @redirect_hash[method_name.to_sym]
-
-      if rclass
-        if block_given?
-          rclass.redirect_handler(klass, recv, method_name, 0, sandbox) do |mh|
-            yield(mh)
-          end
-        else
-          rclass.redirect_handler(klass, recv, method_name, 0, sandbox)
-        end
-      else
-        nil
-      end
-    end
   end
 
   def initialize
@@ -189,21 +169,6 @@ public
 
   def allow_method(method_name)
     @allowed_methods << method_name
-  end
-
-  def handle_redirection(klass, recv, method_name, sandbox)
-    if @last_allowed
-      if block_given?
-        @last_allowed.handle_redirection(klass, recv, method_name, sandbox) do |mh|
-          yield(mh)
-        end
-      else
-        @last_allowed.handle_redirection(klass, recv, method_name, sandbox)
-      end
-    else
-      nil
-    end
-
   end
 
   def allow?(klass, recv, method_name, method_id)
