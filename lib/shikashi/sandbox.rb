@@ -132,7 +132,9 @@ module Shikashi
           if source != dest_source then
             privileges = sandbox.privileges[source]
 
-            if privileges then
+            unless privileges then
+               raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
+            else
 #              privileges = privileges.dup
               loop_source = source
               loop_privileges = privileges
