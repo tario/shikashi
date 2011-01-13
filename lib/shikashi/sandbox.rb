@@ -24,6 +24,7 @@ require "shikashi/privileges"
 require "shikashi/pick_argument"
 require "getsource"
 require "timeout"
+require "evalmimic"
 
 module Shikashi
 
@@ -234,8 +235,26 @@ module Shikashi
     # end
     #
     #
-
     def run(*args)
+    end
+
+    define_eval_method :run
+    def internal_eval(b_, args)
+
+      newargs = Array.new
+
+      timeout = args.pick(:timeout) do nil end
+      privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+      code = args.pick(String,:code)
+      binding_ = args.pick(Binding,:binding) do b_ end
+      source = args.pick(:source) do nil end
+      base_namespace = args.pick(:base_namespace) do Object end
+
+      run_i(code, privileges_, binding_, :base_namespace => base_namespace, :timeout => timeout)
+    end
+
+private
+    def run_i(*args)
 
       handler = EvalhookHandler.new
       handler.sandbox = self
@@ -266,7 +285,10 @@ module Shikashi
         end
       end
     end
+
   end
+
+
 end
 
 Shikashi.global_binding = binding()
