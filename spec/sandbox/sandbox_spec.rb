@@ -86,4 +86,14 @@ describe Sandbox, "Shikashi sandbox" do
     A::B::X
   end
 
+  it "should use default binding when is not specified in the arguments and reach local variables" do
+    a = 5
+    Sandbox.new.run("a").should be == 5
+  end
+
+  it "should use default binding when is not specified in the arguments and reach instance variables" do
+    @a = 5
+    Sandbox.new.run("@a").should be == 5
+  end
+
 end
