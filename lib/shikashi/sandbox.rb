@@ -255,11 +255,16 @@ module Shikashi
       run_i(code, privileges_, binding_, :base_namespace => base_namespace, :timeout => timeout)
     end
 
+    def create_hook_handler(*args)
+      hook_handler = EvalhookHandler.new
+      hook_handler.sandbox = self
+      hook_handler.base_namespace = args.pick(:base_namespace) do Object end
+      hook_handler
+    end
+
 private
     def run_i(*args)
 
-      @hook_handler = EvalhookHandler.new
-      @hook_handler.sandbox = self
 
       t = args.pick(:timeout) do nil end
       raise Shikashi::Timeout::Error if t == 0
@@ -274,7 +279,9 @@ private
             code = args.pick(String,:code)
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
-            @hook_handler.base_namespace = args.pick(:base_namespace) do Object end
+            base_namespace = args.pick(:base_namespace) do Object end
+
+            @hook_handler = self.create_hook_handler :base_namespace => base_namespace
 
             code = "nil;\n " + code
 
