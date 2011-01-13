@@ -259,6 +259,12 @@ module Shikashi
       hook_handler = EvalhookHandler.new
       hook_handler.sandbox = self
       hook_handler.base_namespace = args.pick(:base_namespace) do Object end
+
+      source = args.pick(:source) do generate_id end
+      privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+
+      self.privileges[source] = privileges_
+
       hook_handler
     end
 
@@ -281,11 +287,13 @@ private
             source = args.pick(:source) do generate_id end
             base_namespace = args.pick(:base_namespace) do Object end
 
-            @hook_handler = self.create_hook_handler :base_namespace => base_namespace
+            @hook_handler = self.create_hook_handler(
+                    :base_namespace => base_namespace,
+                    :privileges => privileges_,
+                    :source => source
+                    )
 
             code = "nil;\n " + code
-
-            self.privileges[source] = privileges_
 
             @hook_handler.evalhook(code, binding_, source)
           end
