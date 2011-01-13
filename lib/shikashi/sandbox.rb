@@ -68,6 +68,8 @@ module Shikashi
 #Binding of execution, the default is a binding in a global context allowing the definition of module of classes
     attr_reader :chain
 
+    attr_reader :hook_handler
+
 #
 # Generate a random source file name for the sandbox, used internally
 #
@@ -256,8 +258,8 @@ module Shikashi
 private
     def run_i(*args)
 
-      handler = EvalhookHandler.new
-      handler.sandbox = self
+      @hook_handler = EvalhookHandler.new
+      @hook_handler.sandbox = self
 
       t = args.pick(:timeout) do nil end
       raise Shikashi::Timeout::Error if t == 0
@@ -272,13 +274,13 @@ private
             code = args.pick(String,:code)
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
-            handler.base_namespace = args.pick(:base_namespace) do Object end
+            @hook_handler.base_namespace = args.pick(:base_namespace) do Object end
 
             code = "nil;\n " + code
 
             self.privileges[source] = privileges_
 
-            handler.evalhook(code, binding_, source)
+            @hook_handler.evalhook(code, binding_, source)
           end
         rescue ::Timeout::Error
           raise Shikashi::Timeout::Error
