@@ -128,7 +128,7 @@ module Shikashi
 
         if method_name
 
-          source = caller[1].split(":").first
+          source = self.get_caller
           dest_source = klass.instance_method(method_name).body.file
 
           privileges = nil
@@ -144,6 +144,7 @@ module Shikashi
 
               while loop_privileges and loop_source != dest_source
                 unless loop_privileges.allow?(klass,recv,method_name,method_id)
+                  p loop_privileges
                   raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
                 end
 
@@ -169,6 +170,10 @@ module Shikashi
 
 
       end # if
+
+      def get_caller
+        caller[2].split(":").first
+      end
     end # Class
 
     #Run the code in sandbox with the given privileges, also run privileged code in the sandbox context for
