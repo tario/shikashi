@@ -32,5 +32,19 @@ describe Sandbox, "Shikashi sandbox hook handler" do
 
   end
 
+  it "should not raise SecurityError with method privileges" do
+    sandbox = Sandbox.new
+    priv = Privileges.new
+    priv.allow_method(:foo)
+
+    hook_handler = sandbox.create_hook_handler(:privileges => priv)
+
+    x = X.new
+    lambda {
+      hook_handler.handle_method(X,x,:foo)
+    }.should_not raise_error
+
+  end
+
 
 end
