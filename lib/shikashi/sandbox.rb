@@ -144,7 +144,6 @@ module Shikashi
 
               while loop_privileges and loop_source != dest_source
                 unless loop_privileges.allow?(klass,recv,method_name,method_id)
-                  p loop_privileges
                   raise SecurityError.new("Cannot invoke method #{method_name} on object of class #{klass}")
                 end
 
