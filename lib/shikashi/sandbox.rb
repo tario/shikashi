@@ -96,7 +96,7 @@ module Shikashi
       end
 
       def handle_gasgn( global_id, value )
-        source = caller[1].split(":").first
+        source = get_caller
 
         privileges = sandbox.privileges[source]
         if privileges
@@ -109,7 +109,7 @@ module Shikashi
       end
 
       def handle_cdecl(klass, const_id, value)
-        source = caller[1].split(":").first
+        source = get_caller
 
         privileges = sandbox.privileges[source]
         if privileges
