@@ -1,4 +1,8 @@
-0.3.0	shikashi HookHandler opened to allow use it in nested hook handlers
+0.3.1	Fixed package info
+
+0.3.0	Added enclosure by base_namespace parameter (see examples)
+
+		shikashi HookHandler opened to allow use it in nested hook handlers
 
 		Added restriction to avoid the system calls when using %x[] and ``
 
