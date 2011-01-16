@@ -88,6 +88,10 @@ module Shikashi
       @chain[inner] = outer
     end
 
+    def base_namespace
+      @base_namespace
+    end
+
     class EvalhookHandler < EvalHook::HookHandler
       attr_accessor :sandbox
 
@@ -254,7 +258,8 @@ module Shikashi
       code = args.pick(String,:code)
       binding_ = args.pick(Binding,:binding) do b_ end
       source = args.pick(:source) do nil end
-      base_namespace = args.pick(:base_namespace) do Object end
+      base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
+      @base_namespace = base_namespace
 
       run_i(code, privileges_, binding_, :base_namespace => base_namespace, :timeout => timeout)
     end
@@ -262,7 +267,8 @@ module Shikashi
     def create_hook_handler(*args)
       hook_handler = EvalhookHandler.new
       hook_handler.sandbox = self
-      hook_handler.base_namespace = args.pick(:base_namespace) do Object end
+      @base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
+      hook_handler.base_namespace = @base_namespace
 
       source = args.pick(:source) do generate_id end
       privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
@@ -272,7 +278,16 @@ module Shikashi
       hook_handler
     end
 
+    module Z
+
+    end
 private
+
+    def create_adhoc_base_namespace
+      @base_namespace = Sandbox::Z
+      @base_namespace
+    end
+
     def run_i(*args)
 
 
@@ -289,7 +304,7 @@ private
             code = args.pick(String,:code)
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
-            base_namespace = args.pick(:base_namespace) do Object end
+            base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
 
             @hook_handler = self.create_hook_handler(
                     :base_namespace => base_namespace,
@@ -298,6 +313,13 @@ private
                     )
 
             code = "nil;\n " + code
+
+
+            if (base_namespace.instance_of? Module)
+              code = "module #{base_namespace}\n #{code}\n end\n"
+            else
+              code = "class #{base_namespace}\n #{code}\n end\n"
+            end
 
             @hook_handler.evalhook(code, binding_, source)
           end
