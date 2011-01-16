@@ -28,13 +28,11 @@ end
 ')
 
 # run privileged code in the sandbox, if not, the methods defined in the sandbox are invisible from outside
-s.run do
-	x = X.new
-	x.foo
-	begin
+x = X.new
+x.foo
+begin
 	x.bar
-	rescue SecurityError => e
-		print "x.bar failed due security errors: #{e}\n"
-	end
+rescue SecurityError => e
+	print "x.bar failed due security errors: #{e}\n"
 end
 
