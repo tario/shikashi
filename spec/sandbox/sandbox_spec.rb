@@ -122,7 +122,7 @@ describe Sandbox, "Shikashi sandbox" do
     priv.allow_xstr
 
     lambda {
-      s.run("%x[echo hello world]")
+      s.run("%x[echo hello world]", priv)
     }.should_not raise_error
 
   end
