@@ -96,7 +96,15 @@ module Shikashi
       attr_accessor :sandbox
 
       def handle_xstr( str )
-        raise SecurityError, "fobidden shell commands"
+        source = get_caller
+
+        privileges = sandbox.privileges[source]
+        if privileges
+          unless privileges.xstr_allowed?
+            raise SecurityError, "fobidden shell commands"
+          end
+        end
+        str
       end
 
       def handle_gasgn( global_id, value )

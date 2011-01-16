@@ -250,6 +250,9 @@ public
     end
   end
 
+  def xstr_allowed?
+    @xstr_allowed
+  end
 
   def global_allowed?(varname)
     @allowed_globals.include? varname
@@ -257,6 +260,22 @@ public
 
   def const_allowed?(varname)
     @allowed_consts.include? varname
+  end
+
+  # defines the permissions needed to execute system calls from the script
+  #
+  # Example:
+  #
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_xstr
+  #
+  #   s.run(priv, '
+  #     %x[ls -l]
+  #   ')
+  def allow_xstr
+    @xstr_allowed = true
   end
 
   # defines the permissions needed to create or change a global variable
