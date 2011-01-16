@@ -104,7 +104,8 @@ module Shikashi
             raise SecurityError, "fobidden shell commands"
           end
         end
-        str
+
+        `#{str}`
       end
 
       def handle_gasgn( global_id, value )
