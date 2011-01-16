@@ -1,8 +1,8 @@
-0.2.0	shikashi HookHandler opened to allow use it in nested hook handlers
+0.3.0	shikashi HookHandler opened to allow use it in nested hook handlers
 
 		Added restriction to avoid the system calls when using %x[] and ``
 
-		Added control over the access to constants and global variables (See documentation)
+0.2.0	Added control over the access to constants and global variables (See documentation)
 
 		Remove rallhook dependency, replaced by getsource
 
