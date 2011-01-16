@@ -102,4 +102,17 @@ describe Sandbox, "Shikashi sandbox" do
   it "should allow reference to instance variables" do
      N.new.foo.should be == 5
   end
+
+  it "should create a default module for each sandbox" do
+     s = Sandbox.new
+     s.run('class X
+              def foo
+                 "foo inside sandbox"
+              end
+            end')
+
+     x = s.base_namespace::X.new
+     x.foo.should be == "foo inside sandbox"
+  end
+
 end
