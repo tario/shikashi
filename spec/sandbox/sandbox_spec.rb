@@ -21,7 +21,7 @@ describe Sandbox, "Shikashi sandbox" do
     x = X.new
 
     lambda {
-      Sandbox.new.run "x.foo", binding
+      Sandbox.new.run "x.foo", binding, :no_base_namespace => true
     }.should raise_error(SecurityError)
 
   end
@@ -34,7 +34,7 @@ describe Sandbox, "Shikashi sandbox" do
       true
     end
 
-    Sandbox.new.run "x.foo", binding, :privileges => privileges
+    Sandbox.new.run "x.foo", binding, :privileges => privileges, :no_base_namespace => true
 
   end
 
@@ -88,13 +88,13 @@ describe Sandbox, "Shikashi sandbox" do
 
   it "should use default binding when is not specified in the arguments and reach local variables" do
     a = 5
-    Sandbox.new.run("a").should be == 5
+    Sandbox.new.run("a", :no_base_namespace => true).should be == 5
   end
 
   class N
     def foo
       @a = 5
-      Sandbox.new.run("@a")
+      Sandbox.new.run("@a", :no_base_namespace => true)
     end
   end
 
