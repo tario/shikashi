@@ -31,7 +31,6 @@ priv.object(X).allow :new
 # allow instance methods of X. Note that the method privileged_operations is not allowed
 priv.instances_of(X).allow :foo, :bar
 
-priv.allow_method :=== # for exception handling
 #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
 s.run(priv, '
 x = X.new
