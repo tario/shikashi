@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Thu Dec 23 19:08:13 -0300 2010</td>
+      <td>Sun Jan 16 14:14:31 -0300 2011</td>
     </tr>
     </table>
   </div>
@@ -228,9 +228,6 @@ define a class from inside the sandbox and use it from outside
         # allow execution of print
         priv.allow_method :print
 
-        # allow definition of classes
-        priv.allow_class_definitions
-
         #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
         s.run(priv, '
         class X
@@ -244,49 +241,47 @@ define a class from inside the sandbox and use it from outside
         end
         ')
 
-        # run privileged code in the sandbox, if not, the methods defined in the sandbox are invisible from outside
-        s.run do
-                x = X.new
-                x.foo
-                begin
+        x = s.base_namespace::X.new
+        x.foo
+        begin
                 x.bar
-                rescue SecurityError =&gt; e
-                        print &quot;x.bar failed due security errors: #{e}\n&quot;
-                end
+        rescue SecurityError =&gt; e
+                print &quot;x.bar failed due security errors: #{e}\n&quot;
         end
 </pre>
-<h3>Redirection feature example</h3>
-<p>
-Simple redirection of method, the method foo is replaced by
-TestWrapper::call
-</p>
+<h3>Base namespace</h3>
 <pre>
         require &quot;rubygems&quot;
         require &quot;shikashi&quot;
 
-        class TestWrapper &lt; Shikashi::Sandbox::MethodWrapper
-          def call(*args)
-            print &quot;called foo from source: #{source}, arguments: #{args.inspect} \n&quot;
-            original_call(*args)
-          end
+        include Shikashi
+
+        module SandboxModule
         end
 
         class X
-          def foo
-            print &quot;original foo\n&quot;
-          end
+                def foo
+                        print &quot;X#foo\n&quot;
+                end
         end
 
-        s = Shikashi::Sandbox.new
-        perm = Shikashi::Privileges.new
+        s = Sandbox.new
+        priv = Privileges.new
+        priv.allow_method :print
 
-        perm.object(X).allow :new
-        perm.instances_of(X).allow :foo
+        s.run( &quot;
+          class ::X
+                def foo
+                        print \&quot;foo defined inside the sandbox\\n\&quot;
+                end
+          end
+          &quot;, priv, :base_namespace =&gt; SandboxModule)
 
-        # redirect calls to foo to TestWrapper
-        perm.instances_of(X).redirect :foo, TestWrapper
+        x = X.new # X class is not affected by the sandbox (The X Class defined in the sandbox is SandboxModule::X)
+        x.foo
 
-        s.run(perm,&quot;X.new.foo&quot;)
+        x = SandboxModule::X.new
+        x.foo
 </pre>
 <h3>Timeout example</h3>
 <pre>
@@ -302,7 +297,7 @@ TestWrapper::call
 </pre>
 <h2>Copying</h2>
 <p>
-Copyright (c) 2010 Dario Seminara, released under the GPL License (see
+Copyright (c) 2010-2011 Dario Seminara, released under the GPL License (see
 LICENSE)
 </p>
 

@@ -108,10 +108,12 @@ time)
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000025">add_source_chain</a>&nbsp;&nbsp;
-      <a href="#M000023">generate_id</a>&nbsp;&nbsp;
-      <a href="#M000024">new</a>&nbsp;&nbsp;
-      <a href="#M000027">redirect</a>&nbsp;&nbsp;
+      <a href="#M000024">add_source_chain</a>&nbsp;&nbsp;
+      <a href="#M000025">base_namespace</a>&nbsp;&nbsp;
+      <a href="#M000028">create_hook_handler</a>&nbsp;&nbsp;
+      <a href="#M000022">generate_id</a>&nbsp;&nbsp;
+      <a href="#M000027">internal_eval</a>&nbsp;&nbsp;
+      <a href="#M000023">new</a>&nbsp;&nbsp;
       <a href="#M000026">run</a>&nbsp;&nbsp;
       </div>
     </div>
@@ -127,7 +129,6 @@ time)
       <h3 class="section-bar">Classes and Modules</h3>
 
       Class <a href="Sandbox/EvalhookHandler.html" class="link">Shikashi::Sandbox::EvalhookHandler</a><br />
-Class <a href="Sandbox/MethodWrapper.html" class="link">Shikashi::Sandbox::MethodWrapper</a><br />
 
     </div>
 
@@ -147,6 +148,11 @@ Binding of execution, the default is a binding in a global context allowing
 the definition of module of classes
 
 </td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">hook_handler</td>
+          <td class="context-item-value">&nbsp;[R]&nbsp;</td>
+          <td class="context-item-desc"></td>
         </tr>
         <tr class="top-aligned-row context-row">
           <td class="context-item-name">privileges</td>
@@ -172,25 +178,24 @@ Example
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000024" class="method-detail">
-        <a name="M000024"></a>
+      <div id="method-M000023" class="method-detail">
+        <a name="M000023"></a>
 
         <div class="method-heading">
-          <a href="#M000024" class="method-signature">
+          <a href="#M000023" class="method-signature">
           <span class="method-name">new</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000024-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000024-source">
+            onclick="toggleCode('M000023-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000023-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 78</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 81</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
       <span class="ruby-ivar">@privileges</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
       <span class="ruby-ivar">@chain</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
-      <span class="ruby-ivar">@redirect_hash</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
@@ -199,11 +204,11 @@ Example
 
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000025" class="method-detail">
-        <a name="M000025"></a>
+      <div id="method-M000024" class="method-detail">
+        <a name="M000024"></a>
 
         <div class="method-heading">
-          <a href="#M000025" class="method-signature">
+          <a href="#M000024" class="method-signature">
           <span class="method-name">add_source_chain</span><span class="method-args">(outer, inner)</span>
           </a>
         </div>
@@ -213,10 +218,10 @@ Example
 add a chain of sources, used internally
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000025-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000025-source">
+            onclick="toggleCode('M000024-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000024-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 85</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 87</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_source_chain</span>(<span class="ruby-identifier">outer</span>, <span class="ruby-identifier">inner</span>)
       <span class="ruby-ivar">@chain</span>[<span class="ruby-identifier">inner</span>] = <span class="ruby-identifier">outer</span>
     <span class="ruby-keyword kw">end</span>
@@ -225,11 +230,67 @@ add a chain of sources, used internally
         </div>
       </div>
 
-      <div id="method-M000023" class="method-detail">
-        <a name="M000023"></a>
+      <div id="method-M000025" class="method-detail">
+        <a name="M000025"></a>
 
         <div class="method-heading">
-          <a href="#M000023" class="method-signature">
+          <a href="#M000025" class="method-signature">
+          <span class="method-name">base_namespace</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000025-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000025-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 91</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">base_namespace</span>
+      <span class="ruby-ivar">@base_namespace</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000028" class="method-detail">
+        <a name="M000028"></a>
+
+        <div class="method-heading">
+          <a href="#M000028" class="method-signature">
+          <span class="method-name">create_hook_handler</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000028-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000028-source">
+<pre>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 277</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">create_hook_handler</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+      <span class="ruby-identifier">hook_handler</span> = <span class="ruby-constant">EvalhookHandler</span>.<span class="ruby-identifier">new</span>
+      <span class="ruby-identifier">hook_handler</span>.<span class="ruby-identifier">sandbox</span> = <span class="ruby-keyword kw">self</span>
+      <span class="ruby-ivar">@base_namespace</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:base_namespace</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-identifier">create_adhoc_base_namespace</span> <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">hook_handler</span>.<span class="ruby-identifier">base_namespace</span> = <span class="ruby-ivar">@base_namespace</span>
+
+      <span class="ruby-identifier">source</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:source</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-identifier">generate_id</span> <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">privileges_</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Privileges</span>,<span class="ruby-identifier">:privileges</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-constant">Privileges</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">privileges</span>[<span class="ruby-identifier">source</span>] = <span class="ruby-identifier">privileges_</span>
+
+      <span class="ruby-identifier">hook_handler</span>
+    <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
+
+        <div class="method-heading">
+          <a href="#M000022" class="method-signature">
           <span class="method-name">generate_id</span><span class="method-args">()</span>
           </a>
         </div>
@@ -239,10 +300,10 @@ add a chain of sources, used internally
 Generate a random source file name for the sandbox, used internally
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000023-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000023-source">
+            onclick="toggleCode('M000022-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000022-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 74</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 77</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">generate_id</span>
       <span class="ruby-node">&quot;sandbox-#{rand(1000000)}&quot;</span>
     <span class="ruby-keyword kw">end</span>
@@ -256,35 +317,30 @@ Generate a random source file name for the sandbox, used internally
 
         <div class="method-heading">
           <a href="#M000027" class="method-signature">
-          <span class="method-name">redirect</span><span class="method-args">(*args)</span>
+          <span class="method-name">internal_eval</span><span class="method-args">(b_, args)</span>
           </a>
         </div>
       
         <div class="method-description">
-          <p>
-redirects a method with given name to a wrapper of the given class example:
-</p>
-<pre>
- class PrintWrapper &lt; Shikashi::Sandbox::MethodWrapper
-   def call(*args)
-     print &quot;invoked print\n&quot;
-     original_call(*args)
-   end
- end
-
- sandbox.redirect(:print, PrintWrapper)
- sandbox.redirect(:print, :wrapper_class =&gt; PrintWrapper)
- sandbox.redirect(:method_name =&gt; :print, :wrapper_class =&gt; PrintWrapper)
-</pre>
           <p><a class="source-toggle" href="#"
             onclick="toggleCode('M000027-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000027-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 418</span>
-    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">redirect</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-      <span class="ruby-identifier">mname</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Symbol</span>, <span class="ruby-identifier">:method_name</span>)
-      <span class="ruby-identifier">wclass</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Class</span>, <span class="ruby-identifier">:wrapper_class</span>)
-      <span class="ruby-ivar">@redirect_hash</span>[<span class="ruby-identifier">mname</span>] = <span class="ruby-identifier">wclass</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 261</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">internal_eval</span>(<span class="ruby-identifier">b_</span>, <span class="ruby-identifier">args</span>)
+
+      <span class="ruby-identifier">newargs</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>
+
+      <span class="ruby-identifier">timeout</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:timeout</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">privileges_</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Privileges</span>,<span class="ruby-identifier">:privileges</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-constant">Privileges</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">code</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">String</span>,<span class="ruby-identifier">:code</span>)
+      <span class="ruby-identifier">binding_</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Binding</span>,<span class="ruby-identifier">:binding</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-identifier">b_</span> <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">source</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:source</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">end</span>
+      <span class="ruby-identifier">base_namespace</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:base_namespace</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-identifier">create_adhoc_base_namespace</span> <span class="ruby-keyword kw">end</span>
+      <span class="ruby-ivar">@base_namespace</span> = <span class="ruby-identifier">base_namespace</span>
+      <span class="ruby-identifier">no_base_namespace</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:no_base_namespace</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-keyword kw">false</span> <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-identifier">run_i</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">privileges_</span>, <span class="ruby-identifier">binding_</span>, <span class="ruby-identifier">:base_namespace</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">base_namespace</span>, <span class="ruby-identifier">:timeout</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">timeout</span>, <span class="ruby-identifier">:no_base_namespace</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">no_base_namespace</span>)
     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
@@ -383,35 +439,8 @@ Example 2:
             onclick="toggleCode('M000026-source');return false;">[Source]</a></p>
           <div class="method-source-code" id="M000026-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 373</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 257</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">run</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
-
-      <span class="ruby-identifier">handler</span> = <span class="ruby-constant">EvalhookHandler</span>.<span class="ruby-identifier">new</span>
-      <span class="ruby-identifier">handler</span>.<span class="ruby-identifier">redirect</span> = <span class="ruby-ivar">@redirect_hash</span>
-      <span class="ruby-identifier">handler</span>.<span class="ruby-identifier">sandbox</span> = <span class="ruby-keyword kw">self</span>
-
-      <span class="ruby-identifier">t</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:timeout</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-keyword kw">nil</span> <span class="ruby-keyword kw">end</span>
-      <span class="ruby-identifier">raise</span> <span class="ruby-constant">Shikashi</span><span class="ruby-operator">::</span><span class="ruby-constant">Timeout</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">t</span> <span class="ruby-operator">==</span> <span class="ruby-value">0</span>
-      <span class="ruby-identifier">t</span> = <span class="ruby-identifier">t</span> <span class="ruby-operator">||</span> <span class="ruby-value">0</span>
-
-      <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
-        <span class="ruby-keyword kw">yield</span>
-      <span class="ruby-keyword kw">else</span>
-        <span class="ruby-keyword kw">begin</span>
-          <span class="ruby-identifier">timeout</span> <span class="ruby-identifier">t</span> <span class="ruby-keyword kw">do</span>
-            <span class="ruby-identifier">privileges_</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Privileges</span>,<span class="ruby-identifier">:privileges</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-constant">Privileges</span>.<span class="ruby-identifier">new</span> <span class="ruby-keyword kw">end</span>
-            <span class="ruby-identifier">code</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">String</span>,<span class="ruby-identifier">:code</span>)
-            <span class="ruby-identifier">binding_</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-constant">Binding</span>,<span class="ruby-identifier">:binding</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-constant">Shikashi</span>.<span class="ruby-identifier">global_binding</span> <span class="ruby-keyword kw">end</span>
-            <span class="ruby-identifier">source</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pick</span>(<span class="ruby-identifier">:source</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-identifier">generate_id</span> <span class="ruby-keyword kw">end</span>
-
-            <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">privileges</span>[<span class="ruby-identifier">source</span>] = <span class="ruby-identifier">privileges_</span>
-
-            <span class="ruby-identifier">handler</span>.<span class="ruby-identifier">evalhook</span>(<span class="ruby-identifier">code</span>, <span class="ruby-identifier">binding_</span>, <span class="ruby-identifier">source</span>)
-          <span class="ruby-keyword kw">end</span>
-        <span class="ruby-keyword kw">rescue</span> <span class="ruby-operator">::</span><span class="ruby-constant">Timeout</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>
-          <span class="ruby-identifier">raise</span> <span class="ruby-constant">Shikashi</span><span class="ruby-operator">::</span><span class="ruby-constant">Timeout</span><span class="ruby-operator">::</span><span class="ruby-constant">Error</span>
-        <span class="ruby-keyword kw">end</span>
-      <span class="ruby-keyword kw">end</span>
     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
