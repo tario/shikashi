@@ -17,7 +17,7 @@ priv.object(self).allow :print
 
 #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
 code = "
-def self.inside_foo(a)
+def inside_foo(a)
 	print 'inside_foo'
 	if (a)
 	system('ls -l') # denied
@@ -25,10 +25,7 @@ def self.inside_foo(a)
 end
 "
 
-s.run(priv, code)
+s.run(code, priv)
 
-s.run do
 inside_foo(false)
-inside_foo(true) #SecurityError
-
-end
+#inside_foo(true) #SecurityError
