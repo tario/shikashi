@@ -82,5 +82,34 @@ describe Sandbox, "Shikashi sandbox hook handler" do
     }.should_not raise_error
   end
 
+  it "should raise SecurityError with handle_cdecl without privileges" do
+    sandbox = Sandbox.new
 
+    hook_handler = sandbox.create_hook_handler(:source => "test-source")
+
+    def hook_handler.get_caller
+      "test-source"
+    end
+
+    lambda {
+      hook_handler.handle_cdecl(Object,:A,nil)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should not raise SecurityError with handle_cdecl with privileges" do
+    sandbox = Sandbox.new
+    privileges = Privileges.new
+
+    privileges.allow_const(:A)
+
+    hook_handler = sandbox.create_hook_handler(:privileges => privileges, :source => "test-source")
+
+    def hook_handler.get_caller
+      "test-source"
+    end
+
+    lambda {
+      hook_handler.handle_cdecl(Object,:A,nil)
+    }.should_not raise_error
+  end
 end
