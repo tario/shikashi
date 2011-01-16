@@ -20,5 +20,5 @@ priv.object(self).allow :foo
 priv.instances_of(Fixnum).allow :times
 
 #inside the sandbox, only can use method foo on main and method times on instances of Fixnum
-s.run(priv, "2.times do foo end")
+s.run(priv, "2.times do foo end", :no_base_namespace => true)
 

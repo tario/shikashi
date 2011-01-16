@@ -28,7 +28,7 @@ end
 ')
 
 # run privileged code in the sandbox, if not, the methods defined in the sandbox are invisible from outside
-x = X.new
+x = s.base_namespace::X.new
 x.foo
 begin
 	x.bar

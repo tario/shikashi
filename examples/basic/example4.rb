@@ -24,9 +24,9 @@ end
 ')
 
 # run privileged code in the sandbox, if not, the methods defined in the sandbox are invisible from outside
-A.inside_foo(false)
+s.base_namespace::A.inside_foo(false)
 begin
-	A.inside_foo(true)
+	s.base_namespace::A.inside_foo(true)
 rescue SecurityError => e
 	print "A.inside_foo(true) failed due security errors: #{e}\n"
 end

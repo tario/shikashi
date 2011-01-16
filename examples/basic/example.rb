@@ -7,8 +7,6 @@ include Shikashi
 s = Sandbox.new
 priv = Privileges.new
 
-priv.allow_method :singleton_method_added
-
 # allow execution of foo in this object
 priv.object(self).allow :foo
 
@@ -25,7 +23,7 @@ def inside_foo(a)
 end
 "
 
-s.run(code, priv)
+s.run(code, priv, :no_base_namespace => true)
 
 inside_foo(false)
 #inside_foo(true) #SecurityError
