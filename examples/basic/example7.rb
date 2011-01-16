@@ -1,5 +1,3 @@
-# "hello world" from within the sandbox
-
 require "rubygems"
 require "shikashi"
 
