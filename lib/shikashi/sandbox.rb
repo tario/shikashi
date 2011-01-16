@@ -279,13 +279,14 @@ module Shikashi
       hook_handler
     end
 
-    module Z
 
-    end
 private
 
     def create_adhoc_base_namespace
-      @base_namespace = Sandbox::Z
+      rnd_module_name = "SandboxBasenamespace#{rand(100000000)}"
+
+      eval("module Shikashi::Sandbox::#{rnd_module_name}; end")
+      @base_namespace = eval("Shikashi::Sandbox::#{rnd_module_name}")
       @base_namespace
     end
 
