@@ -51,5 +51,19 @@ describe Sandbox, "Shikashi sandbox hook handler" do
 
   end
 
+  it "should raise SecurityError with handle_gasgn without privileges" do
+    sandbox = Sandbox.new
+
+    hook_handler = sandbox.create_hook_handler(:source => "test-source")
+
+    def hook_handler.get_caller
+      "test-source"
+    end
+
+    lambda {
+      hook_handler.handle_gasgn(:$a,nil)
+    }.should raise_error(SecurityError)
+  end
+
 
 end
