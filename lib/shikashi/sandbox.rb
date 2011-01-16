@@ -260,8 +260,9 @@ module Shikashi
       source = args.pick(:source) do nil end
       base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
       @base_namespace = base_namespace
+      no_base_namespace = args.pick(:no_base_namespace) do false end
 
-      run_i(code, privileges_, binding_, :base_namespace => base_namespace, :timeout => timeout)
+      run_i(code, privileges_, binding_, :base_namespace => base_namespace, :timeout => timeout, :no_base_namespace => no_base_namespace)
     end
 
     def create_hook_handler(*args)
@@ -305,6 +306,7 @@ private
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
             base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
+            no_base_namespace = args.pick(:no_base_namespace) do false end
 
             @hook_handler = self.create_hook_handler(
                     :base_namespace => base_namespace,
@@ -314,11 +316,12 @@ private
 
             code = "nil;\n " + code
 
-
-            if (base_namespace.instance_of? Module)
-              code = "module #{base_namespace}\n #{code}\n end\n"
-            else
-              code = "class #{base_namespace}\n #{code}\n end\n"
+            unless no_base_namespace
+              if (base_namespace.instance_of? Module)
+                code = "module #{base_namespace}\n #{code}\n end\n"
+              else
+                code = "class #{base_namespace}\n #{code}\n end\n"
+              end
             end
 
             @hook_handler.evalhook(code, binding_, source)
