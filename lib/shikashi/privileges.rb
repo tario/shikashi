@@ -94,8 +94,10 @@ public
     @allowed_instances = Hash.new
     @allowed_methods = Array.new
     @allowed_klass_methods = Hash.new
-    @allowed_globals = Array.new
-    @allowed_consts = Array.new
+    @allowed_read_globals = Array.new
+    @allowed_read_consts = Array.new
+    @allowed_write_globals = Array.new
+    @allowed_write_consts = Array.new
   end
 
 private
@@ -254,12 +256,20 @@ public
     @xstr_allowed
   end
 
-  def global_allowed?(varname)
-    @allowed_globals.include? varname
+  def global_read_allowed?(varname)
+    @allowed_read_globals.include? varname
   end
 
-  def const_allowed?(varname)
-    @allowed_consts.include? varname
+  def global_write_allowed?(varname)
+    @allowed_write_globals.include? varname
+  end
+
+  def const_read_allowed?(varname)
+    @allowed_read_consts.include? varname
+  end
+
+  def const_write_allowed?(varname)
+    @allowed_write_consts.include? varname
   end
 
   # defines the permissions needed to execute system calls from the script
@@ -286,7 +296,28 @@ public
   #   priv = Privileges.new
   #
   #   priv.allow_method :print
-  #   priv.allow_global :$a
+  #   priv.allow_global_read :$a
+  #
+  #   $a = 9
+  #
+  #   s.run(priv, '
+  #   print "$a value:", $a, "s\n"
+  #   ')
+  #
+  #
+  def allow_global_read( varname )
+    @allowed_read_globals << varname
+  end
+
+  # defines the permissions needed to create or change a global variable
+  #
+  # Example:
+  #
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_method :print
+  #   priv.allow_global_write :$a
   #
   #   s.run(priv, '
   #   $a = 9
@@ -295,9 +326,10 @@ public
   #
   #   p $a
   #
-  def allow_global( varname )
-    @allowed_globals << varname
+  def allow_global_write( varname )
+    @allowed_write_globals << varname
   end
+
 
   # defines the permissions needed to create or change a const
   #
@@ -306,7 +338,7 @@ public
   #   priv = Privileges.new
   #
   #   priv.allow_method :print
-  #   priv.allow_const "Object::A"
+  #   priv.allow_const_write "Object::A"
   #
   #   s.run(priv, '
   #   print "assigned 8 to Object::A\n"
@@ -317,6 +349,24 @@ public
 
   def allow_const( varname )
     @allowed_consts << varname
+  end
+
+  # defines the permissions needed to create or change a const
+  #
+  # Example:
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_method :print
+  #   priv.allow_const_read "Object::A"
+  #
+  #   A = 8
+  #   s.run(priv, '
+  #   print "assigned Object::A:", A,"\n"
+  #   ')
+  #
+  def allow_const_read( varname )
+    @allowed_read_consts << varname
   end
 
 end
