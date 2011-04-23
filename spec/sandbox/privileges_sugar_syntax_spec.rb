@@ -92,4 +92,10 @@ describe Privileges, "Shikashi::Privileges" do
     priv.global_read_allowed?(:$a).should be == true
   end
 
+  it "should allow multiple global read (as symbol) in only one allow_global_read call" do
+    priv = Privileges.new
+    priv.allow_global_read(:$a, :$b)
+    priv.global_read_allowed?(:$a).should be == true
+    priv.global_read_allowed?(:$b).should be == true
+  end
 end
