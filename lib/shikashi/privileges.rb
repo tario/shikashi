@@ -369,6 +369,14 @@ public
     @allowed_read_consts << varname
   end
 
+
+  class << self
+    (Shikashi::Privileges.instance_methods - Object.instance_methods).each do |mname|
+      define_method(mname) do |*args|
+        Shikashi::Privileges.new.send(mname, *args)
+      end
+    end
+  end
 end
 
 end
