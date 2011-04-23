@@ -191,4 +191,60 @@ describe Sandbox, "Shikashi sandbox" do
     }.should_not raise_error
   end
 
+
+  it "should not allow global variable write" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    lambda {
+      s.run("$a = 9", priv)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should allow global variable write when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_global_write(:$a)
+
+    lambda {
+      s.run("$a = 9", priv)
+    }.should_not raise_error
+  end
+
+  it "should not allow constant write" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    lambda {
+      s.run("TESTCONSTANT9999 = 99991", priv)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should allow constant write when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_const_write("TESTCONSTANT9998")
+
+    lambda {
+      s.run("TESTCONSTANT9998 = 99981", priv)
+      TESTCONSTANT9998.should be == 99981
+    }.should_not raise_error
+  end
+
+  it "should allow write constant nested on classes when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_const_read("Fixnum")
+    priv.allow_const_write("Fixnum::TESTCONSTANT9997")
+
+    lambda {
+      s.run("Fixnum::TESTCONSTANT9997 = 99971", priv)
+      Fixnum::TESTCONSTANT9997.should be == 99971
+    }.should_not raise_error
+  end
+
+
 end
