@@ -137,5 +137,24 @@ describe Sandbox, "Shikashi sandbox" do
 
   end
 
+  it "should not allow global variable read" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    lambda {
+      s.run("$a", priv)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should allow global variable read when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_global_read(:$a)
+
+    lambda {
+      s.run("$a", priv)
+    }.should_not raise_error
+  end
 
 end
