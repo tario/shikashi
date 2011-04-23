@@ -308,6 +308,7 @@ public
   #
   def allow_global_read( varname )
     @allowed_read_globals << varname
+    self
   end
 
   # defines the permissions needed to create or change a global variable
@@ -329,6 +330,7 @@ public
   #
   def allow_global_write( varname )
     @allowed_write_globals << varname
+    self
   end
 
 
@@ -350,6 +352,7 @@ public
 
   def allow_const_write( varname )
     @allowed_write_consts << varname
+    self
   end
 
   # defines the permissions needed to create or change a const
@@ -368,6 +371,7 @@ public
   #
   def allow_const_read( varname )
     @allowed_read_consts << varname
+    self
   end
 
 
