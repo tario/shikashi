@@ -175,7 +175,7 @@ describe Sandbox, "Shikashi sandbox" do
     TESTCONSTANT9998 = 9998
 
     lambda {
-      s.run("TESTCONSTANT9998", priv)
+      s.run("TESTCONSTANT9998", priv).should be == 9998
     }.should_not raise_error
   end
 
