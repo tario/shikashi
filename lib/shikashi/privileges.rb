@@ -338,8 +338,11 @@ public
   #
   #   p $a
   #
-  def allow_global_write( varname )
-    @allowed_write_globals << varname
+  def allow_global_write( *varnames )
+    varnames.each do |varname|
+      @allowed_write_globals << varname.to_sym
+    end
+
     self
   end
 
