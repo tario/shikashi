@@ -292,6 +292,8 @@ public
   #   ')
   def allow_xstr
     @xstr_allowed = true
+
+    self
   end
 
   # defines the permissions needed to create or change a global variable
