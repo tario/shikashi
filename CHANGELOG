@@ -1,6 +1,14 @@
-0.2.0	shikashi HookHandler opened to allow use it in nested hook handlers
+0.4.0	Added control over READ access to constants
+
+		Added control over READ access to global variables
+
+0.3.0	Added enclosure by base_namespace parameter (see examples)
+
+		shikashi HookHandler opened to allow use it in nested hook handlers
 
 		Added restriction to avoid the system calls when using %x[] and ``
+		
+0.2.0	shikashi HookHandler opened to allow use it in nested hook handlers
 
 		Added control over the access to constants and global variables (See documentation)
 
