@@ -53,5 +53,19 @@ describe Privileges, "Shikashi::Privileges" do
     Privileges.methods_of(Fixnum).allow_all.should be_kind_of(Privileges)
   end
 
+  it "should chain one allow_method" do
+    priv = Privileges.allow_method(:to_s)
+    priv.allow?(Fixnum,4,:to_s,0).should be == true
+  end
+
+  it "should chain one allow_method and one allow_global" do
+    priv = Privileges.
+        allow_method(:to_s).
+        allow_global_read(:$a)
+
+    priv.allow?(Fixnum,4,:to_s,0).should be == true
+    priv.global_read_allowed?(:$a).should be == true
+  end
+
 
 end
