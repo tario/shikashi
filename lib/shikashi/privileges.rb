@@ -313,8 +313,11 @@ public
   #   ')
   #
   #
-  def allow_global_read( varname )
-    @allowed_read_globals << varname.to_sym
+  def allow_global_read( *varnames )
+    varnames.each do |varname|
+      @allowed_read_globals << varname.to_sym
+    end
+
     self
   end
 
