@@ -146,7 +146,7 @@ describe Sandbox, "Shikashi sandbox hook handler" do
     }.should_not raise_error
   end
 
-  it "should raise SecurityError with handle_cdecl without privileges" do
+  it "should raise SecurityError with handle_const without privileges" do
     sandbox = Sandbox.new
 
     hook_handler = sandbox.create_hook_handler(:source => "test-source")
