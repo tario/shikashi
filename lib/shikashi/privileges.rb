@@ -171,6 +171,7 @@ public
 
   def allow_method(method_name)
     @allowed_methods << method_name
+    self
   end
 
   def allow?(klass, recv, method_name, method_id)
