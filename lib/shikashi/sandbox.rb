@@ -71,6 +71,13 @@ module Shikashi
     attr_reader :hook_handler
 
 #
+#   Same as Sandbox.new.run
+#
+
+    def self.run(*args)
+      Sandbox.new.run(*args)
+    end
+#
 # Generate a random source file name for the sandbox, used internally
 #
 
