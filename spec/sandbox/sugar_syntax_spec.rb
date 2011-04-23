@@ -1,5 +1,7 @@
 require "shikashi"
 
+include Shikashi
+
 describe Sandbox, "Shikashi sandbox" do
   it "should allow single run" do
     Sandbox.run("0").should be == 0
