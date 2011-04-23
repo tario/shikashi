@@ -170,7 +170,7 @@ public
 #
 
   def allow_method(method_name)
-    @allowed_methods << method_name
+    @allowed_methods << method_name.to_sym
     self
   end
 
