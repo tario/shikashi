@@ -115,6 +115,16 @@ describe Sandbox, "Shikashi sandbox" do
      x.foo.should be == "foo inside sandbox"
   end
 
+  it "should not allow xstr when no authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    lambda {
+      s.run("%x[echo hello world]", priv)
+    }.should raise_error(SecurityError)
+
+  end
+
   it "should allow xstr when authorized" do
     s = Sandbox.new
     priv = Privileges.new
