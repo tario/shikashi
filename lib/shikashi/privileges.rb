@@ -347,8 +347,8 @@ public
   #
   #   p A
 
-  def allow_const( varname )
-    @allowed_consts << varname
+  def allow_const_write( varname )
+    @allowed_write_consts << varname
   end
 
   # defines the permissions needed to create or change a const
