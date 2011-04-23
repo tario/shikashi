@@ -314,7 +314,7 @@ public
   #
   #
   def allow_global_read( varname )
-    @allowed_read_globals << varname
+    @allowed_read_globals << varname.to_sym
     self
   end
 
