@@ -40,7 +40,8 @@ public
 
   # Used in Privileges to store information about specified method permissions
   class AllowedMethods
-    def initialize
+    def initialize(privileges = nil)
+      @privileges = privileges
       @allowed_methods = Array.new
       @redirect_hash = Hash.new
       @all = false
@@ -78,11 +79,15 @@ public
       method_names.each do |mn|
       @allowed_methods << mn
       end
+
+      @privileges
     end
 
     #Specifies that any method is allowed
     def allow_all
       @all = true
+
+      @privileges
     end
 
   end
@@ -104,7 +109,7 @@ private
   def hash_entry(hash, key)
     tmp = hash[key]
     unless tmp
-      tmp = AllowedMethods.new
+      tmp = AllowedMethods.new(self)
       hash[key] = tmp
     end
     tmp
