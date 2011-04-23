@@ -67,5 +67,15 @@ describe Privileges, "Shikashi::Privileges" do
     priv.global_read_allowed?(:$a).should be == true
   end
 
+  it "should allow + method (as string)" do
+    priv = Privileges.new
+    priv.allow_method("+")
+    priv.allow?(Fixnum,4,:+,0).should be == true
+  end
 
+  it "should allow + method (as symbol)" do
+    priv = Privileges.new
+    priv.allow_method(:+)
+    priv.allow?(Fixnum,4,:+,0).should be == true
+  end
 end
