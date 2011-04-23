@@ -98,4 +98,23 @@ describe Privileges, "Shikashi::Privileges" do
     priv.global_read_allowed?(:$a).should be == true
     priv.global_read_allowed?(:$b).should be == true
   end
+
+  it "should allow $a global write (as string)" do
+    priv = Privileges.new
+    priv.allow_global_write("$a")
+    priv.global_write_allowed?(:$a).should be == true
+  end
+
+  it "should allow $a global write (as symbol)" do
+    priv = Privileges.new
+    priv.allow_global_write(:$a)
+    priv.global_write_allowed?(:$a).should be == true
+  end
+
+  it "should allow multiple global write (as symbol) in only one allow_global_write call" do
+    priv = Privileges.new
+    priv.allow_global_write(:$a, :$b)
+    priv.global_write_allowed?(:$a).should be == true
+    priv.global_write_allowed?(:$b).should be == true
+  end
 end
