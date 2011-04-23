@@ -121,6 +121,30 @@ module Shikashi
         nil
       end
 
+      def handle_gvar(global_id)
+        source = get_caller
+        privileges = sandbox.privileges[source]
+        if privileges
+          unless privileges.global_read_allowed? global_id
+            raise SecurityError, "cannot access global variable #{global_id}"
+          end
+        end
+
+        nil
+      end
+
+      def handle_const(name)
+        source = get_caller
+        privileges = sandbox.privileges[source]
+        if privileges
+          unless privileges.const_read_allowed? name.to_s
+            raise SecurityError, "cannot access constant #{name}"
+          end
+        end
+
+        nil
+      end
+
       def handle_cdecl(klass, const_id, value)
         source = get_caller
 
