@@ -179,4 +179,16 @@ describe Sandbox, "Shikashi sandbox" do
     }.should_not raise_error
   end
 
+  it "should allow read constant nested on classes when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_const_read("Fixnum")
+    Fixnum::TESTCONSTANT9997 = 9997
+
+    lambda {
+      s.run("Fixnum::TESTCONSTANT9997", priv).should be == 9997
+    }.should_not raise_error
+  end
+
 end
