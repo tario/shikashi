@@ -157,4 +157,26 @@ describe Sandbox, "Shikashi sandbox" do
     }.should_not raise_error
   end
 
+  it "should not allow constant variable read" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    TESTCONSTANT9999 = 9999
+    lambda {
+      s.run("TESTCONSTANT9999", priv)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should allow constant read when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_const_read("TESTCONSTANT9998")
+    TESTCONSTANT9998 = 9998
+
+    lambda {
+      s.run("TESTCONSTANT9998", priv)
+    }.should_not raise_error
+  end
+
 end
