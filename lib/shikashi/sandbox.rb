@@ -151,7 +151,13 @@ module Shikashi
         privileges = sandbox.privileges[source]
         if privileges
           unless privileges.const_write_allowed? "#{klass}::#{const_id}"
-            raise SecurityError.new("Cannot assign const #{klass}::#{const_id}")
+            if (klass == Object)
+              unless privileges.const_write_allowed? const_id.to_s
+                raise SecurityError.new("Cannot assign const #{const_id}")
+              end
+            else
+              raise SecurityError.new("Cannot assign const #{klass}::#{const_id}")
+            end
           end
         end
 
