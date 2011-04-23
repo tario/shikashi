@@ -164,7 +164,7 @@ describe Sandbox, "Shikashi sandbox hook handler" do
     sandbox = Sandbox.new
     privileges = Privileges.new
 
-    privileges.allow_const_read("Object::A")
+    privileges.allow_const_read("A")
 
     hook_handler = sandbox.create_hook_handler(:privileges => privileges, :source => "test-source")
 
