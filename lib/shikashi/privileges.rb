@@ -365,7 +365,7 @@ public
 
   def allow_const_write( *varnames )
     varnames.each do |varname|
-      @allowed_write_consts << varname
+      @allowed_write_consts << varname.to_s
     end
     self
   end
@@ -386,7 +386,7 @@ public
   #
   def allow_const_read( *varnames )
     varnames.each do |varname|
-      @allowed_read_consts << varname
+      @allowed_read_consts << varname.to_s
     end
 
     self
