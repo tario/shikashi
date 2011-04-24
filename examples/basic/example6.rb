@@ -9,7 +9,7 @@ s = Sandbox.new
 priv = Privileges.new
 
 priv.allow_method :print
-priv.allow_global :$a
+priv.allow_global_write :$a
 
 s.run(priv, '
 $a = 9
