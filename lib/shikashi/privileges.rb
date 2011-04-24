@@ -278,7 +278,7 @@ public
     @allowed_write_consts.include? varname
   end
 
-  # defines the permissions needed to execute system calls from the script
+  # Enables the permissions needed to execute system calls from the script
   #
   # Example:
   #
@@ -302,7 +302,7 @@ public
     self
   end
 
-  # defines the permissions needed to create or change a global variable
+  # Enables the permissions needed to read one or more global variables
   #
   # Example:
   #
@@ -323,7 +323,7 @@ public
   #   Sandbox.run('
   #   print "$a value:", $a, "s\n"
   #   print "$b value:", $b, "s\n"
-  #   ', Privileges.allow_global_read(:$a,:$b)
+  #   ', Privileges.allow_global_read(:$a,:$b) )
   #
   def allow_global_read( *varnames )
     varnames.each do |varname|
@@ -333,7 +333,7 @@ public
     self
   end
 
-  # defines the permissions needed to create or change a global variable
+  # Enables the permissions needed to create or change one or more global variables
   #
   # Example:
   #
@@ -359,7 +359,7 @@ public
   end
 
 
-  # defines the permissions needed to create or change a const
+  # Enables the permissions needed to create or change one or more constants
   #
   # Example:
   #   s = Sandbox.new
@@ -382,7 +382,7 @@ public
     self
   end
 
-  # defines the permissions needed to create or change a const
+  # Enables the permissions needed to read one or more constants
   #
   # Example:
   #   s = Sandbox.new
