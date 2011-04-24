@@ -117,4 +117,44 @@ describe Privileges, "Shikashi::Privileges" do
     priv.global_write_allowed?(:$a).should be == true
     priv.global_write_allowed?(:$b).should be == true
   end
+
+  # constants
+
+  it "should allow constant read (as string)" do
+    priv = Privileges.new
+    priv.allow_const_read("TESTCONSTANT")
+    priv.const_read_allowed?("TESTCONSTANT").should be == true
+  end
+
+  it "should allow constant read (as symbol)" do
+    priv = Privileges.new
+    priv.allow_const_read(:TESTCONSTANT)
+    priv.const_read_allowed?("TESTCONSTANT").should be == true
+  end
+
+  it "should allow multiple constant read (as string) in only one allow_const_read call" do
+    priv = Privileges.new
+    priv.allow_const_read("TESTCONSTANT1", "TESTCONSTANT2")
+    priv.const_read_allowed?("TESTCONSTANT1").should be == true
+    priv.const_read_allowed?("TESTCONSTANT2").should be == true
+  end
+
+  it "should allow constant write (as string)" do
+    priv = Privileges.new
+    priv.allow_const_write("TESTCONSTANT")
+    priv.const_write_allowed?("TESTCONSTANT").should be == true
+  end
+
+  it "should allow constant write (as symbol)" do
+    priv = Privileges.new
+    priv.allow_const_write(:TESTCONSTANT)
+    priv.const_write_allowed?("TESTCONSTANT").should be == true
+  end
+
+  it "should allow multiple constant write (as symbol) in only one allow_const_write call" do
+    priv = Privileges.new
+    priv.allow_const_write("TESTCONSTANT1", "TESTCONSTANT2")
+    priv.const_write_allowed?("TESTCONSTANT1").should be == true
+    priv.const_write_allowed?("TESTCONSTANT2").should be == true
+  end
 end
