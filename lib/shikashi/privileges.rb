@@ -290,6 +290,12 @@ public
   #   s.run(priv, '
   #     %x[ls -l]
   #   ')
+  #
+  #
+  # Example 2:
+  #
+  #   Sandbox.run('%x[ls -l]', Privileges.allow_xstr)
+  #
   def allow_xstr
     @xstr_allowed = true
 
@@ -312,6 +318,12 @@ public
   #   print "$a value:", $a, "s\n"
   #   ')
   #
+  # Example 2
+  #
+  #   Sandbox.run('
+  #   print "$a value:", $a, "s\n"
+  #   print "$b value:", $b, "s\n"
+  #   ', Privileges.allow_global_read(:$a,:$b)
   #
   def allow_global_read( *varnames )
     varnames.each do |varname|
