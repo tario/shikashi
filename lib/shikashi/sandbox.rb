@@ -75,7 +75,7 @@ module Shikashi
 #
 
     def self.run(*args)
-      Sandbox.new.run(*args)
+      Sandbox.new.run(Shikashi.global_binding, *args)
     end
 #
 # Generate a random source file name for the sandbox, used internally
