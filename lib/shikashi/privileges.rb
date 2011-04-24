@@ -363,8 +363,10 @@ public
   #
   #   p A
 
-  def allow_const_write( varname )
-    @allowed_write_consts << varname
+  def allow_const_write( *varnames )
+    varnames.each do |varname|
+      @allowed_write_consts << varname
+    end
     self
   end
 
@@ -382,8 +384,11 @@ public
   #   print "assigned Object::A:", A,"\n"
   #   ')
   #
-  def allow_const_read( varname )
-    @allowed_read_consts << varname
+  def allow_const_read( *varnames )
+    varnames.each do |varname|
+      @allowed_read_consts << varname
+    end
+
     self
   end
 
