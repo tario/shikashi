@@ -1,4 +1,6 @@
-0.4.0	Added control over READ access to constants
+0.4.0	Implemented sugar syntax for Sandbox and Privileges methods (see documentation)
+
+		Added control over READ access to constants
 
 		Added control over READ access to global variables
 
