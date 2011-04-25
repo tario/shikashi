@@ -48,6 +48,8 @@ describe Sandbox, "Shikashi sandbox" do
   end
 
   it "should allow use a class declared inside" do
+    priv = Privileges.new
+    priv.allow_method :new
     Sandbox.new.run("
       class TestInsideClass
         def foo
@@ -55,7 +57,7 @@ describe Sandbox, "Shikashi sandbox" do
       end
 
       TestInsideClass.new.foo
-    ")
+    ", priv)
   end
 
   it "should use base namespace when the code uses colon3 node (2 levels)" do
