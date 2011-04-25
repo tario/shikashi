@@ -144,12 +144,14 @@ module Shikashi
         source = get_caller
         privileges = sandbox.privileges[source]
         if privileges
-          unless privileges.const_read_allowed? name.to_s
-            raise SecurityError, "cannot access constant #{name}"
+          unless sandbox.base_namespace.constants.include? name
+            unless privileges.const_read_allowed? name.to_s
+              raise SecurityError, "cannot access constant #{name}"
+            end
           end
         end
 
-        nil
+        const_value(sandbox.base_namespace.const_get(name))
       end
 
       def handle_cdecl(klass, const_id, value)
