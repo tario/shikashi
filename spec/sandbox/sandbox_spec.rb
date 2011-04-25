@@ -47,6 +47,16 @@ describe Sandbox, "Shikashi sandbox" do
     end
   end
 
+  it "should allow use a class declared inside" do
+    Sandbox.new.run("
+      class TestInsideClass
+        def foo
+        end
+      end
+
+      TestInsideClass.new.foo
+    ")
+  end
 
   it "should use base namespace when the code uses colon3 node (2 levels)" do
     Sandbox.new.run( "::B",
