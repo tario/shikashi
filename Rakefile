@@ -14,7 +14,6 @@ spec = Gem::Specification.new do |s|
   s.homepage = "http://github.com/tario/shikashi"
   s.add_dependency "evalhook", ">= 0.2.0"
   s.add_dependency "getsource", ">= 0.1.0"
-  s.add_dependency "evalmimic", ">= 0.1.0"
   s.has_rdoc = true
   s.extra_rdoc_files = [ 'README' ]
 #  s.rdoc_options << '--main' << 'README'

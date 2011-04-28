@@ -24,7 +24,6 @@ require "shikashi/privileges"
 require "shikashi/pick_argument"
 require "getsource"
 require "timeout"
-require "evalmimic"
 
 module Shikashi
 
@@ -294,19 +293,18 @@ module Shikashi
     #
     #
     def run(*args)
-    end
-
-    define_eval_method :run
-    def internal_eval(b_, args)
-
       newargs = Array.new
 
       timeout = args.pick(:timeout) do nil end
       privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
       code = args.pick(String,:code)
-      binding_ = args.pick(Binding,:binding) do b_ end
+
       source = args.pick(:source) do nil end
       base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
+
+      binding_ = args.pick(Binding,:binding) do
+        base_namespace_binding()
+      end
       @base_namespace = base_namespace
       no_base_namespace = args.pick(:no_base_namespace) do false end
 
@@ -329,6 +327,12 @@ module Shikashi
 
 
 private
+
+    def base_namespace_binding
+      eval("module #{base_namespace}
+        binding
+      end")
+    end
 
     def create_adhoc_base_namespace
       rnd_module_name = "SandboxBasenamespace#{rand(100000000)}"
