@@ -331,7 +331,7 @@ private
     def base_namespace_binding
       eval("module #{base_namespace}
         binding
-      end")
+      end", Shikashi.global_binding)
     end
 
     def create_adhoc_base_namespace
