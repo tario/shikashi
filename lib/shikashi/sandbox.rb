@@ -303,7 +303,7 @@ module Shikashi
       base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
 
       binding_ = args.pick(Binding,:binding) do
-        base_namespace_binding()
+        nil
       end
       @base_namespace = base_namespace
       no_base_namespace = args.pick(:no_base_namespace) do false end
@@ -327,12 +327,6 @@ module Shikashi
 
 
 private
-
-    def base_namespace_binding
-      eval("module #{base_namespace}
-        binding
-      end", Shikashi.global_binding)
-    end
 
     def create_adhoc_base_namespace
       rnd_module_name = "SandboxBasenamespace#{rand(100000000)}"
