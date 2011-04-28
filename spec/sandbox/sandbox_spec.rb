@@ -98,15 +98,15 @@ describe Sandbox, "Shikashi sandbox" do
     A::B::X
   end
 
-  it "should use default binding when is not specified in the arguments and reach local variables" do
+  it "should reach local variables when current binding is used" do
     a = 5
-    Sandbox.new.run("a", :no_base_namespace => true).should be == 5
+    Sandbox.new.run("a", binding, :no_base_namespace => true).should be == 5
   end
 
   class N
     def foo
       @a = 5
-      Sandbox.new.run("@a", :no_base_namespace => true)
+      Sandbox.new.run("@a", binding, :no_base_namespace => true)
     end
   end
 
