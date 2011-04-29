@@ -93,10 +93,10 @@ about specified method permissions
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000020">allow</a>&nbsp;&nbsp;
-      <a href="#M000021">allow_all</a>&nbsp;&nbsp;
-      <a href="#M000019">allowed?</a>&nbsp;&nbsp;
-      <a href="#M000018">new</a>&nbsp;&nbsp;
+      <a href="#M000024">allow</a>&nbsp;&nbsp;
+      <a href="#M000025">allow_all</a>&nbsp;&nbsp;
+      <a href="#M000023">allowed?</a>&nbsp;&nbsp;
+      <a href="#M000022">new</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -118,22 +118,23 @@ about specified method permissions
     <div id="methods">
       <h3 class="section-bar">Public Class methods</h3>
 
-      <div id="method-M000018" class="method-detail">
-        <a name="M000018"></a>
+      <div id="method-M000022" class="method-detail">
+        <a name="M000022"></a>
 
         <div class="method-heading">
-          <a href="#M000018" class="method-signature">
-          <span class="method-name">new</span><span class="method-args">()</span>
+          <a href="#M000022" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(privileges = nil)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000018-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000018-source">
+            onclick="toggleCode('M000022-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000022-source">
 <pre>
 <span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 43</span>
-    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>
+    <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">privileges</span> = <span class="ruby-keyword kw">nil</span>)
+      <span class="ruby-ivar">@privileges</span> = <span class="ruby-identifier">privileges</span>
       <span class="ruby-ivar">@allowed_methods</span> = <span class="ruby-constant">Array</span>.<span class="ruby-identifier">new</span>
       <span class="ruby-ivar">@redirect_hash</span> = <span class="ruby-constant">Hash</span>.<span class="ruby-identifier">new</span>
       <span class="ruby-ivar">@all</span> = <span class="ruby-keyword kw">false</span>
@@ -145,11 +146,11 @@ about specified method permissions
 
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000020" class="method-detail">
-        <a name="M000020"></a>
+      <div id="method-M000024" class="method-detail">
+        <a name="M000024"></a>
 
         <div class="method-heading">
-          <a href="#M000020" class="method-signature">
+          <a href="#M000024" class="method-signature">
           <span class="method-name">allow</span><span class="method-args">(*method_names)</span>
           </a>
         </div>
@@ -165,25 +166,27 @@ Specifies that a method or list of methods are allowed Example
  allowed_methods.allow :foo, :bar, :test
 </pre>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000020-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000020-source">
+            onclick="toggleCode('M000024-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000024-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 77</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 78</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">method_names</span>)
       <span class="ruby-identifier">method_names</span>.<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">mn</span><span class="ruby-operator">|</span>
       <span class="ruby-ivar">@allowed_methods</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">mn</span>
       <span class="ruby-keyword kw">end</span>
+
+      <span class="ruby-ivar">@privileges</span>
     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
       </div>
 
-      <div id="method-M000021" class="method-detail">
-        <a name="M000021"></a>
+      <div id="method-M000025" class="method-detail">
+        <a name="M000025"></a>
 
         <div class="method-heading">
-          <a href="#M000021" class="method-signature">
+          <a href="#M000025" class="method-signature">
           <span class="method-name">allow_all</span><span class="method-args">()</span>
           </a>
         </div>
@@ -193,23 +196,25 @@ Specifies that a method or list of methods are allowed Example
 Specifies that any method is allowed
 </p>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000021-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000021-source">
+            onclick="toggleCode('M000025-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000025-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 84</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 87</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allow_all</span>
       <span class="ruby-ivar">@all</span> = <span class="ruby-keyword kw">true</span>
+
+      <span class="ruby-ivar">@privileges</span>
     <span class="ruby-keyword kw">end</span>
 </pre>
           </div>
         </div>
       </div>
 
-      <div id="method-M000019" class="method-detail">
-        <a name="M000019"></a>
+      <div id="method-M000023" class="method-detail">
+        <a name="M000023"></a>
 
         <div class="method-heading">
-          <a href="#M000019" class="method-signature">
+          <a href="#M000023" class="method-signature">
           <span class="method-name">allowed?</span><span class="method-args">(method_name)</span>
           </a>
         </div>
@@ -230,10 +235,10 @@ return true if the method named method_name is allowed Example
  instance of AllowedMethods
 </pre>
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000019-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000019-source">
+            onclick="toggleCode('M000023-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000023-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 61</span>
+<span class="ruby-comment cmt"># File lib/shikashi/privileges.rb, line 62</span>
     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">allowed?</span>(<span class="ruby-identifier">method_name</span>)
        <span class="ruby-keyword kw">if</span> <span class="ruby-ivar">@all</span>
          <span class="ruby-keyword kw">true</span>
