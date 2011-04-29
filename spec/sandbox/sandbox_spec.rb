@@ -47,6 +47,18 @@ describe Sandbox, "Shikashi sandbox" do
     end
   end
 
+  it "should allow use a class declared inside" do
+    priv = Privileges.new
+    priv.allow_method :new
+    Sandbox.new.run("
+      class TestInsideClass
+        def foo
+        end
+      end
+
+      TestInsideClass.new.foo
+    ", priv)
+  end
 
   it "should use base namespace when the code uses colon3 node (2 levels)" do
     Sandbox.new.run( "::B",
@@ -86,15 +98,15 @@ describe Sandbox, "Shikashi sandbox" do
     A::B::X
   end
 
-  it "should use default binding when is not specified in the arguments and reach local variables" do
+  it "should reach local variables when current binding is used" do
     a = 5
-    Sandbox.new.run("a", :no_base_namespace => true).should be == 5
+    Sandbox.new.run("a", binding, :no_base_namespace => true).should be == 5
   end
 
   class N
     def foo
       @a = 5
-      Sandbox.new.run("@a", :no_base_namespace => true)
+      Sandbox.new.run("@a", binding, :no_base_namespace => true)
     end
   end
 
@@ -115,6 +127,16 @@ describe Sandbox, "Shikashi sandbox" do
      x.foo.should be == "foo inside sandbox"
   end
 
+  it "should not allow xstr when no authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    lambda {
+      s.run("%x[echo hello world]", priv)
+    }.should raise_error(SecurityError)
+
+  end
+
   it "should allow xstr when authorized" do
     s = Sandbox.new
     priv = Privileges.new
@@ -125,6 +147,115 @@ describe Sandbox, "Shikashi sandbox" do
       s.run("%x[echo hello world]", priv)
     }.should_not raise_error
 
+  end
+
+  it "should not allow global variable read" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    lambda {
+      s.run("$a", priv)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should allow global variable read when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_global_read(:$a)
+
+    lambda {
+      s.run("$a", priv)
+    }.should_not raise_error
+  end
+
+  it "should not allow constant variable read" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    TESTCONSTANT9999 = 9999
+    lambda {
+      s.run("TESTCONSTANT9999", priv)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should allow constant read when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_const_read("TESTCONSTANT9998")
+    TESTCONSTANT9998 = 9998
+
+    lambda {
+      s.run("TESTCONSTANT9998", priv).should be == 9998
+    }.should_not raise_error
+  end
+
+  it "should allow read constant nested on classes when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_const_read("Fixnum")
+    Fixnum::TESTCONSTANT9997 = 9997
+
+    lambda {
+      s.run("Fixnum::TESTCONSTANT9997", priv).should be == 9997
+    }.should_not raise_error
+  end
+
+
+  it "should not allow global variable write" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    lambda {
+      s.run("$a = 9", priv)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should allow global variable write when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_global_write(:$a)
+
+    lambda {
+      s.run("$a = 9", priv)
+    }.should_not raise_error
+  end
+
+  it "should not allow constant write" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    lambda {
+      s.run("TESTCONSTANT9999 = 99991", priv)
+    }.should raise_error(SecurityError)
+  end
+
+  it "should allow constant write when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_const_write("TESTCONSTANT9998")
+
+    lambda {
+      s.run("TESTCONSTANT9998 = 99981", priv)
+      TESTCONSTANT9998.should be == 99981
+    }.should_not raise_error
+  end
+
+  it "should allow write constant nested on classes when authorized" do
+    s = Sandbox.new
+    priv = Privileges.new
+
+    priv.allow_const_read("Fixnum")
+    priv.allow_const_write("Fixnum::TESTCONSTANT9997")
+
+    lambda {
+      s.run("Fixnum::TESTCONSTANT9997 = 99971", priv)
+      Fixnum::TESTCONSTANT9997.should be == 99971
+    }.should_not raise_error
   end
 
 

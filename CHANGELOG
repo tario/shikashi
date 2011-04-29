@@ -1,3 +1,11 @@
+0.4.0	Removed evalmimic dependency
+
+		Implemented sugar syntax for Sandbox and Privileges methods (see documentation)
+
+		Added control over READ access to constants
+
+		Added control over READ access to global variables
+
 0.3.1	Fixed package info
 
 0.3.0	Added enclosure by base_namespace parameter (see examples)
@@ -5,6 +13,8 @@
 		shikashi HookHandler opened to allow use it in nested hook handlers
 
 		Added restriction to avoid the system calls when using %x[] and ``
+		
+0.2.0	shikashi HookHandler opened to allow use it in nested hook handlers
 
 0.2.0	Added control over the access to constants and global variables (See documentation)
 

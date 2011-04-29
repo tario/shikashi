@@ -24,7 +24,6 @@ require "shikashi/privileges"
 require "shikashi/pick_argument"
 require "getsource"
 require "timeout"
-require "evalmimic"
 
 module Shikashi
 
@@ -71,6 +70,13 @@ module Shikashi
     attr_reader :hook_handler
 
 #
+#   Same as Sandbox.new.run
+#
+
+    def self.run(*args)
+      Sandbox.new.run(Shikashi.global_binding, *args)
+    end
+#
 # Generate a random source file name for the sandbox, used internally
 #
 
@@ -113,7 +119,7 @@ module Shikashi
 
         privileges = sandbox.privileges[source]
         if privileges
-          unless privileges.global_allowed? global_id
+          unless privileges.global_write_allowed? global_id
             raise SecurityError.new("Cannot assign global variable #{global_id}")
           end
         end
@@ -121,13 +127,45 @@ module Shikashi
         nil
       end
 
+      def handle_gvar(global_id)
+        source = get_caller
+        privileges = sandbox.privileges[source]
+        if privileges
+          unless privileges.global_read_allowed? global_id
+            raise SecurityError, "cannot access global variable #{global_id}"
+          end
+        end
+
+        nil
+      end
+
+      def handle_const(name)
+        source = get_caller
+        privileges = sandbox.privileges[source]
+        if privileges
+          unless sandbox.base_namespace.constants.include? name
+            unless privileges.const_read_allowed? name.to_s
+              raise SecurityError, "cannot access constant #{name}"
+            end
+          end
+        end
+
+        const_value(sandbox.base_namespace.const_get(name))
+      end
+
       def handle_cdecl(klass, const_id, value)
         source = get_caller
 
         privileges = sandbox.privileges[source]
         if privileges
-          unless privileges.const_allowed? "#{klass}::#{const_id}"
-            raise SecurityError.new("Cannot assign const #{klass}::#{const_id}")
+          unless privileges.const_write_allowed? "#{klass}::#{const_id}"
+            if (klass == Object)
+              unless privileges.const_write_allowed? const_id.to_s
+                raise SecurityError.new("Cannot assign const #{const_id}")
+              end
+            else
+              raise SecurityError.new("Cannot assign const #{klass}::#{const_id}")
+            end
           end
         end
 
@@ -255,19 +293,18 @@ module Shikashi
     #
     #
     def run(*args)
-    end
-
-    define_eval_method :run
-    def internal_eval(b_, args)
-
       newargs = Array.new
 
       timeout = args.pick(:timeout) do nil end
       privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
       code = args.pick(String,:code)
-      binding_ = args.pick(Binding,:binding) do b_ end
+
       source = args.pick(:source) do nil end
       base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
+
+      binding_ = args.pick(Binding,:binding) do
+        nil
+      end
       @base_namespace = base_namespace
       no_base_namespace = args.pick(:no_base_namespace) do false end
 

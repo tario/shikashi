@@ -40,7 +40,8 @@ public
 
   # Used in Privileges to store information about specified method permissions
   class AllowedMethods
-    def initialize
+    def initialize(privileges = nil)
+      @privileges = privileges
       @allowed_methods = Array.new
       @redirect_hash = Hash.new
       @all = false
@@ -78,11 +79,15 @@ public
       method_names.each do |mn|
       @allowed_methods << mn
       end
+
+      @privileges
     end
 
     #Specifies that any method is allowed
     def allow_all
       @all = true
+
+      @privileges
     end
 
   end
@@ -94,15 +99,17 @@ public
     @allowed_instances = Hash.new
     @allowed_methods = Array.new
     @allowed_klass_methods = Hash.new
-    @allowed_globals = Array.new
-    @allowed_consts = Array.new
+    @allowed_read_globals = Array.new
+    @allowed_read_consts = Array.new
+    @allowed_write_globals = Array.new
+    @allowed_write_consts = Array.new
   end
 
 private
   def hash_entry(hash, key)
     tmp = hash[key]
     unless tmp
-      tmp = AllowedMethods.new
+      tmp = AllowedMethods.new(self)
       hash[key] = tmp
     end
     tmp
@@ -168,7 +175,8 @@ public
 #
 
   def allow_method(method_name)
-    @allowed_methods << method_name
+    @allowed_methods << method_name.to_sym
+    self
   end
 
   def allow?(klass, recv, method_name, method_id)
@@ -254,15 +262,23 @@ public
     @xstr_allowed
   end
 
-  def global_allowed?(varname)
-    @allowed_globals.include? varname
+  def global_read_allowed?(varname)
+    @allowed_read_globals.include? varname
   end
 
-  def const_allowed?(varname)
-    @allowed_consts.include? varname
+  def global_write_allowed?(varname)
+    @allowed_write_globals.include? varname
   end
 
-  # defines the permissions needed to execute system calls from the script
+  def const_read_allowed?(varname)
+    @allowed_read_consts.include? varname
+  end
+
+  def const_write_allowed?(varname)
+    @allowed_write_consts.include? varname
+  end
+
+  # Enables the permissions needed to execute system calls from the script
   #
   # Example:
   #
@@ -274,11 +290,19 @@ public
   #   s.run(priv, '
   #     %x[ls -l]
   #   ')
+  #
+  #
+  # Example 2:
+  #
+  #   Sandbox.run('%x[ls -l]', Privileges.allow_xstr)
+  #
   def allow_xstr
     @xstr_allowed = true
+
+    self
   end
 
-  # defines the permissions needed to create or change a global variable
+  # Enables the permissions needed to read one or more global variables
   #
   # Example:
   #
@@ -286,7 +310,38 @@ public
   #   priv = Privileges.new
   #
   #   priv.allow_method :print
-  #   priv.allow_global :$a
+  #   priv.allow_global_read :$a
+  #
+  #   $a = 9
+  #
+  #   s.run(priv, '
+  #   print "$a value:", $a, "s\n"
+  #   ')
+  #
+  # Example 2
+  #
+  #   Sandbox.run('
+  #   print "$a value:", $a, "s\n"
+  #   print "$b value:", $b, "s\n"
+  #   ', Privileges.allow_global_read(:$a,:$b) )
+  #
+  def allow_global_read( *varnames )
+    varnames.each do |varname|
+      @allowed_read_globals << varname.to_sym
+    end
+
+    self
+  end
+
+  # Enables the permissions needed to create or change one or more global variables
+  #
+  # Example:
+  #
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_method :print
+  #   priv.allow_global_write :$a
   #
   #   s.run(priv, '
   #   $a = 9
@@ -295,18 +350,23 @@ public
   #
   #   p $a
   #
-  def allow_global( varname )
-    @allowed_globals << varname
+  def allow_global_write( *varnames )
+    varnames.each do |varname|
+      @allowed_write_globals << varname.to_sym
+    end
+
+    self
   end
 
-  # defines the permissions needed to create or change a const
+
+  # Enables the permissions needed to create or change one or more constants
   #
   # Example:
   #   s = Sandbox.new
   #   priv = Privileges.new
   #
   #   priv.allow_method :print
-  #   priv.allow_const "Object::A"
+  #   priv.allow_const_write "Object::A"
   #
   #   s.run(priv, '
   #   print "assigned 8 to Object::A\n"
@@ -315,10 +375,43 @@ public
   #
   #   p A
 
-  def allow_const( varname )
-    @allowed_consts << varname
+  def allow_const_write( *varnames )
+    varnames.each do |varname|
+      @allowed_write_consts << varname.to_s
+    end
+    self
   end
 
+  # Enables the permissions needed to read one or more constants
+  #
+  # Example:
+  #   s = Sandbox.new
+  #   priv = Privileges.new
+  #
+  #   priv.allow_method :print
+  #   priv.allow_const_read "Object::A"
+  #
+  #   A = 8
+  #   s.run(priv, '
+  #   print "assigned Object::A:", A,"\n"
+  #   ')
+  #
+  def allow_const_read( *varnames )
+    varnames.each do |varname|
+      @allowed_read_consts << varname.to_s
+    end
+
+    self
+  end
+
+
+  class << self
+    (Shikashi::Privileges.instance_methods - Object.instance_methods).each do |mname|
+      define_method(mname) do |*args|
+        Shikashi::Privileges.new.send(mname, *args)
+      end
+    end
+  end
 end
 
 end
