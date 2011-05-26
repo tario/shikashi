@@ -3,6 +3,8 @@ require "shikashi"
 
 include Shikashi
 
+$top_level_binding = binding
+
 describe Sandbox, "Shikashi sandbox" do
   it "should run empty code without privileges" do
     Sandbox.new.run ""
@@ -39,9 +41,9 @@ describe Sandbox, "Shikashi sandbox" do
   end
 
 
-  module ::A
-    module B
-      module C
+  module ::A4
+    module B4
+      module C4
 
       end
     end
@@ -61,41 +63,41 @@ describe Sandbox, "Shikashi sandbox" do
   end
 
   it "should use base namespace when the code uses colon3 node (2 levels)" do
-    Sandbox.new.run( "::B",
-        :base_namespace => A
-    ).should be == A::B
+    Sandbox.new.run( "::B4",
+        :base_namespace => A4
+    ).should be == A4::B4
   end
 
   it "should change base namespace when classes are declared (2 levels)" do
     Sandbox.new.run( "
-                class ::X
+                class ::X4
                    def foo
                    end
                 end
             ",
-        :base_namespace => A
+        :base_namespace => A4
     )
 
-    A::X
+    A4::X4
   end
 
   it "should use base namespace when the code uses colon3 node (3 levels)" do
-    Sandbox.new.run( "::C",
-        :base_namespace => A::B
-    ).should be == A::B::C
+    Sandbox.new.run( "::C4",
+        $top_level_binding, :base_namespace => ::A4::B4
+    ).should be == ::A4::B4::C4
   end
 
   it "should change base namespace when classes are declared (3 levels)" do
     Sandbox.new.run( "
-                class ::X
+                class ::X4
                    def foo
                    end
                 end
             ",
-        :base_namespace => A::B
+        $top_level_binding, :base_namespace => ::A4::B4
     )
 
-    A::B::X
+    A4::B4::X4
   end
 
   it "should reach local variables when current binding is used" do
