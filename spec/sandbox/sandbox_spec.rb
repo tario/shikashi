@@ -184,7 +184,7 @@ describe Sandbox, "Shikashi sandbox" do
     priv = Privileges.new
 
     priv.allow_const_read("TESTCONSTANT9998")
-    TESTCONSTANT9998 = 9998
+    ::TESTCONSTANT9998 = 9998
 
     lambda {
       s.run("TESTCONSTANT9998", priv).should be == 9998
