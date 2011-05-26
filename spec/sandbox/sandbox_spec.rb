@@ -39,7 +39,7 @@ describe Sandbox, "Shikashi sandbox" do
   end
 
 
-  module A
+  module ::A
     module B
       module C
 
@@ -51,12 +51,12 @@ describe Sandbox, "Shikashi sandbox" do
     priv = Privileges.new
     priv.allow_method :new
     Sandbox.new.run("
-      class TestInsideClass
+      class ::TestInsideClass
         def foo
         end
       end
 
-      TestInsideClass.new.foo
+      ::TestInsideClass.new.foo
     ", priv)
   end
 
