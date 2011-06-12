@@ -260,5 +260,47 @@ describe Sandbox, "Shikashi sandbox" do
     }.should_not raise_error
   end
 
+  it "should allow package of code" do
+    s = Sandbox.new
+
+    lambda {
+      s.packet('print "hello world\n"')
+    }.should_not raise_error
+  end
+
+  def self.package_oracle(code, *args)
+     it "should allow and execute package of code" do
+       e1 = nil
+       e2 = nil
+       r1 = nil
+       r2 = nil
+
+       begin
+         s = Sandbox.new
+         r1 = s.run(code, *args)
+       rescue Exception => e
+         e1 = e
+       end
+
+       begin
+         s = Sandbox.new
+         packet = s.packet(code)
+         r2 = packet.run(*args)
+       rescue Exception => e
+         e2 = e
+       end
+
+       e1.should be == e2
+       r1.should be == r2
+     end
+  end
+
+  class ::XPackage
+    def foo
+
+    end
+  end
+
+  package_oracle "1", :binding => binding
 
 end
