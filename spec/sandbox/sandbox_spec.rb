@@ -302,6 +302,6 @@ describe Sandbox, "Shikashi sandbox" do
   end
 
   package_oracle ["1"], [:binding => binding]
-  package_oracle ["1+1"], [:binding => binding, :privileges => Privileges.allow_method(:+)]
+  package_oracle ["1+1",{ :privileges => Privileges.allow_method(:+)}], [:binding => binding]
 
 end
