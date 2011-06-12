@@ -346,6 +346,16 @@ module Shikashi
           :privileges => privileges_,
           :source => source)
 
+      code = "nil;\n " + code
+
+      unless no_base_namespace
+        if (base_namespace.instance_of? Module)
+          code = "module #{base_namespace}\n #{code}\n end\n"
+        else
+          code = "class #{base_namespace}\n #{code}\n end\n"
+        end
+      end
+
       evalhook_packet = @hook_handler.packet(code)
       Shikashi::Sandbox::Packet.new(evalhook_packet, privileges_, source)
     end
