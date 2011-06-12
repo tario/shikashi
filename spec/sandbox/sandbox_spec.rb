@@ -268,7 +268,7 @@ describe Sandbox, "Shikashi sandbox" do
     }.should_not raise_error
   end
 
-  def self.package_oracle(code, *args)
+  def self.package_oracle(args1, args2)
      it "should allow and execute package of code" do
        e1 = nil
        e2 = nil
@@ -277,15 +277,15 @@ describe Sandbox, "Shikashi sandbox" do
 
        begin
          s = Sandbox.new
-         r1 = s.run(code, *args)
+         r1 = s.run(*(args1+args2))
        rescue Exception => e
          e1 = e
        end
 
        begin
          s = Sandbox.new
-         packet = s.packet(code)
-         r2 = packet.run(*args)
+         packet = s.packet(*args1)
+         r2 = packet.run(*args2)
        rescue Exception => e
          e2 = e
        end
@@ -301,6 +301,7 @@ describe Sandbox, "Shikashi sandbox" do
     end
   end
 
-  package_oracle "1", :binding => binding
+  package_oracle ["1"], [:binding => binding]
+  package_oracle ["1+1"], [:binding => binding, :privileges => Privileges.allow_method(:+)]
 
 end
