@@ -98,6 +98,29 @@ module Shikashi
       @base_namespace
     end
 
+    class Packet
+      def initialize(evalhook_packet, default_privileges, source) #:nodoc:
+        @evalhook_packet = evalhook_packet
+        @default_privileges = default_privileges
+        @source = source
+      end
+
+      def run(*args)
+        t = args.pick(:timeout) do nil end
+        binding_ = args.pick(Binding,:binding) do
+          nil
+        end
+
+        begin
+          timeout t do
+            @evalhook_packet.run(binding_, @source, 0)
+          end
+        rescue ::Timeout::Error
+          raise Shikashi::Timeout::Error
+        end
+      end
+    end
+
     class EvalhookHandler < EvalHook::HookHandler
       attr_accessor :sandbox
 
@@ -309,6 +332,22 @@ module Shikashi
       no_base_namespace = args.pick(:no_base_namespace) do false end
 
       run_i(code, privileges_, binding_, :base_namespace => base_namespace, :timeout => timeout, :no_base_namespace => no_base_namespace)
+    end
+
+    def packet(*args)
+      code = args.pick(String,:code)
+      base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
+      no_base_namespace = args.pick(:no_base_namespace) do false end
+      privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+
+      source = args.pick(:source) do generate_id end
+      @hook_handler = self.create_hook_handler(
+          :base_namespace => base_namespace,
+          :privileges => privileges_,
+          :source => source)
+
+      evalhook_packet = @hook_handler.packet(code)
+      Shikashi::Sandbox::Packet.new(evalhook_packet, privileges_, source)
     end
 
     def create_hook_handler(*args)
