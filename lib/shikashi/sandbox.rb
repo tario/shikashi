@@ -87,6 +87,8 @@ module Shikashi
     def initialize
       @privileges = Hash.new
       @chain = Hash.new
+      @hook_handler = EvalhookHandler.new
+      @hook_handler.sandbox = self
     end
 
 # add a chain of sources, used internally
@@ -404,11 +406,8 @@ private
             base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
             no_base_namespace = args.pick(:no_base_namespace) do false end
 
-            @hook_handler = EvalhookHandler.new
-            @hook_handler.sandbox = self
             @hook_handler.base_namespace = base_namespace
             self.privileges[source] = privileges_
-
             code = "nil;\n " + code
 
             unless no_base_namespace
