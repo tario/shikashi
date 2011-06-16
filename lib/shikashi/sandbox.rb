@@ -338,14 +338,12 @@ module Shikashi
 
     def packet(*args)
       code = args.pick(String,:code)
-      base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
-      no_base_namespace = args.pick(:no_base_namespace) do false end
+      base_namespace = args.pick(:base_namespace) do @hook_handler.base_namespace end
+      no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
       privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
 
       source = args.pick(:source) do generate_id end
 
-      @hook_handler = EvalhookHandler.new
-      @hook_handler.sandbox = self
       self.privileges[source] = privileges_
 
       code = "nil;\n " + code
@@ -403,10 +401,11 @@ private
             code = args.pick(String,:code)
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
-            base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
-            no_base_namespace = args.pick(:no_base_namespace) do false end
+            base_namespace = args.pick(:base_namespace) do @hook_handler.base_namespace end
+            no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
 
             @hook_handler.base_namespace = base_namespace
+
             self.privileges[source] = privileges_
             code = "nil;\n " + code
 
