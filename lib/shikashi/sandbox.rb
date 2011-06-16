@@ -338,10 +338,20 @@ module Shikashi
 
     def packet(*args)
       code = args.pick(String,:code)
-      base_namespace = args.pick(:base_namespace) do @hook_handler.base_namespace end
+      base_namespace = args.pick(:base_namespace) do nil end
       no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
       privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
 
+      hook_handler = nil
+
+      if base_namespace
+        hook_handler = EvalhookHandler.new
+        hook_handler.base_namespace = base_namespace
+        hook_handler.sandbox = self
+      else
+        hook_handler = @hook_handler
+        base_namespace = hook_handler.base_namespace
+      end
       source = args.pick(:source) do generate_id end
 
       self.privileges[source] = privileges_
@@ -387,7 +397,6 @@ private
 
     def run_i(*args)
 
-
       t = args.pick(:timeout) do nil end
       raise Shikashi::Timeout::Error if t == 0
       t = t || 0
@@ -401,10 +410,19 @@ private
             code = args.pick(String,:code)
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
             source = args.pick(:source) do generate_id end
-            base_namespace = args.pick(:base_namespace) do @hook_handler.base_namespace end
+            base_namespace = args.pick(:base_namespace) do nil end
             no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
 
-            @hook_handler.base_namespace = base_namespace
+            hook_handler = nil
+
+            if base_namespace
+              hook_handler = EvalhookHandler.new
+              hook_handler.base_namespace = base_namespace
+              hook_handler.sandbox = self
+            else
+              hook_handler = @hook_handler
+              base_namespace = hook_handler.base_namespace
+            end
 
             self.privileges[source] = privileges_
             code = "nil;\n " + code
@@ -417,7 +435,7 @@ private
               end
             end
 
-            @hook_handler.evalhook(code, binding_, source)
+            hook_handler.evalhook(code, binding_, source)
           end
         rescue ::Timeout::Error
           raise Shikashi::Timeout::Error
