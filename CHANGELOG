@@ -1,3 +1,9 @@
+0.5.0	Refactored sandbox to keep base namespace on each run  (see examples)
+
+		Code packet feature (see documentation)
+
+		Fixed spec to make it compatible with Ruby 1.9
+
 0.4.0	Removed evalmimic dependency
 
 		Implemented sugar syntax for Sandbox and Privileges methods (see documentation)
