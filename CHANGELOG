@@ -1,4 +1,4 @@
-0.5.0	Refactored sandbox to keep base namespace on each run  (see examples)
+0.5.0	Refactored sandbox to keep base namespace on each run  (see base_namespace example on README)
 
 		Code packet feature (see documentation)
 
