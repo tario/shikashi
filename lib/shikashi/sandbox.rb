@@ -254,8 +254,7 @@ module Shikashi
       end
     end # Class
 
-    #Run the code in sandbox with the given privileges, also run privileged code in the sandbox context for
-    #execution of classes and methods defined in the sandbox from outside the sandbox if a block is passed
+    #Run the code in sandbox with the given privileges
     # (see examples)
     #
     #call-seq: run(arguments)
@@ -318,6 +317,42 @@ module Shikashi
     def run(*args)
       run_i(*args)
     end
+
+    #Creates a packet of code with the given privileges to execute later as many times as neccessary
+    #
+    # (see examples)
+    #
+    #call-seq: packet(arguments)
+    #Arguments
+    #
+    # :code             Mandatory argument of class String with the code to execute restricted in the sandbox
+    # :privileges       Optional argument of class Shikashi::Sandbox::Privileges to indicate the restrictions of the
+    #                   code executed in the sandbox. The default is an empty Privileges (absolutly no permission)
+    #                   Must be of class Privileges or passed as hash_key (:privileges => privileges)
+    # :source           Optional argument to indicate the "source name", (visible in the backtraces). Only can
+    #                   be specified as hash parameter
+    # :base_namespace   Alternate module to contain all classes and constants defined by the unprivileged code
+    #                   if not specified, by default, the base_namespace is created with the sandbox itself
+    # :no_base_namespace  Specify to do not use a base_namespace (default false, not recommended to change)
+    #
+    # NOTE: arguments are the same as for Sandbox#run method, except for timeout and binding which can be
+    # used when calling Shikashi::Sandbox::Packet#run
+    #
+    #Example:
+    #
+    # require "rubygems"
+    # require "shikashi"
+    #
+    # include Shikashi
+    #
+    # sandbox = Sandbox.new
+    #
+    # privileges = Privileges.allow_method(:print)
+    #
+    # # this is equivallent to sandbox.run('print "hello world\n"')
+    # packet = sandbox.packet('print "hello world\n"', privileges)
+    # packet.run
+    #
 
     def packet(*args)
       code = args.pick(String,:code)
