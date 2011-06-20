@@ -266,9 +266,7 @@ module Shikashi
     #Run the code in sandbox with the given privileges
     # (see examples)
     #
-    #call-seq: run(arguments)
-    #
-    #Arguments
+    # Arguments
     #
     # :code       Mandatory argument of class String with the code to execute restricted in the sandbox
     # :privileges Optional argument of class Shikashi::Sandbox::Privileges to indicate the restrictions of the
@@ -334,8 +332,7 @@ module Shikashi
     #
     # (see examples)
     #
-    #call-seq: packet(arguments)
-    #Arguments
+    # Arguments
     #
     # :code             Mandatory argument of class String with the code to execute restricted in the sandbox
     # :privileges       Optional argument of class Shikashi::Sandbox::Privileges to indicate the restrictions of the
@@ -365,7 +362,6 @@ module Shikashi
     # packet = sandbox.packet('print "hello world\n"', privileges)
     # packet.run
     #
-
     def packet(*args)
       code = args.pick(String,:code)
       base_namespace = args.pick(:base_namespace) do nil end
