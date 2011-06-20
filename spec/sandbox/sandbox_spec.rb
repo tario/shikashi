@@ -304,4 +304,12 @@ describe Sandbox, "Shikashi sandbox" do
   package_oracle ["1"], [:binding => binding]
   package_oracle ["1+1",{ :privileges => Privileges.allow_method(:+)}], [:binding => binding]
 
+  it "should accept references to classes defined on previous run" do
+    sandbox = Sandbox.new
+
+    sandbox.run("class XinsideSandbox
+    end")
+
+    sandbox.run("XinsideSandbox").should be == sandbox.base_namespace::XinsideSandbox
+  end
 end
