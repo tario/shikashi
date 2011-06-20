@@ -314,11 +314,6 @@ module Shikashi
     #   end
     #    ', :privileges => privileges)
     #
-    # #outside of this block, the method foo defined in the sandbox are invisible
-    # sandbox.run do
-    #   self.foo
-    # end
-    #
     #
     def run(*args)
       run_i(*args)
