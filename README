@@ -167,9 +167,6 @@ define a class from inside the sandbox and use it from outside
 
 	include Shikashi
 
-	module SandboxModule
-	end
-
 	class X
 		def foo
 			print "X#foo\n"
@@ -177,23 +174,23 @@ define a class from inside the sandbox and use it from outside
 	end
 
 	s = Sandbox.new
-	priv = Privileges.new
-	priv.allow_method :print
 
 	s.run( "
-	  class ::X
+	  class X
 		def foo
 			print \"foo defined inside the sandbox\\n\"
 		end
 	  end
-	  ", priv, :base_namespace => SandboxModule)
+	  ", Privileges.allow_method(:print))
 	  
 
 	x = X.new # X class is not affected by the sandbox (The X Class defined in the sandbox is SandboxModule::X)
 	x.foo
 
-	x = SandboxModule::X.new
+	x = s.base_namespace::X.new
 	x.foo
+	
+	s.run("X.new.foo", Privileges.allow_method(:new).allow_method(:foo))
 
 
 
