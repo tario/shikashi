@@ -4,23 +4,22 @@ require "benchmark"
 
 s = Shikashi::Sandbox.new
 
+class NilClass
+	def foo
+	end
+end
+
 Benchmark.bm(7) do |x|
 
 x.report {
 
 	code = "
-		class X
-			def foo(n)
-			end
-		end
-		
-		x = X.new
 		500000.times {
-		x.foo(1000)
+		nil.foo
 		}
 		"
 		
-	s.run code, Shikashi::Privileges.allow_method(:times).allow_method(:new)
+	s.run code, Shikashi::Privileges.allow_method(:times).allow_method(:foo)
 }
 
 end
