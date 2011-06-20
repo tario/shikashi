@@ -170,7 +170,8 @@ module Shikashi
         source = get_caller
         privileges = sandbox.privileges[source]
         if privileges
-          unless sandbox.base_namespace.constants.include? name or sandbox.base_namespace.constants.include? name.to_sym
+          constants = sandbox.base_namespace.constants
+          unless constants.include? name or constants.include? name.to_sym
             unless privileges.const_read_allowed? name.to_s
               raise SecurityError, "cannot access constant #{name}"
             end
