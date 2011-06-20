@@ -109,6 +109,15 @@ module Shikashi
         @source = source
       end
 
+      #Run the code in the package
+      #
+      #call-seq: run(arguments)
+      #
+      #Arguments
+      #
+      # :binding    Optional argument with the binding object of the context where the code is to be executed
+      #             The default is a binding in the global context
+      # :timeout    Optional argument to restrict the execution time of the script to a given value in seconds
       def run(*args)
         t = args.pick(:timeout) do nil end
         binding_ = args.pick(Binding,:binding) do
