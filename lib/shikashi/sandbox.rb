@@ -89,6 +89,8 @@ module Shikashi
       @chain = Hash.new
       @hook_handler = EvalhookHandler.new
       @hook_handler.sandbox = self
+      @base_namespace = create_adhoc_base_namespace
+      @hook_handler.base_namespace = @base_namespace
     end
 
 # add a chain of sources, used internally
@@ -318,22 +320,7 @@ module Shikashi
     #
     #
     def run(*args)
-      newargs = Array.new
-
-      timeout = args.pick(:timeout) do nil end
-      privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
-      code = args.pick(String,:code)
-
-      source = args.pick(:source) do nil end
-      base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
-
-      binding_ = args.pick(Binding,:binding) do
-        nil
-      end
-      @base_namespace = base_namespace
-      no_base_namespace = args.pick(:no_base_namespace) do false end
-
-      run_i(code, privileges_, binding_, :base_namespace => base_namespace, :timeout => timeout, :no_base_namespace => no_base_namespace)
+      run_i(*args)
     end
 
     def packet(*args)
@@ -359,7 +346,7 @@ module Shikashi
       code = "nil;\n " + code
 
       unless no_base_namespace
-        if (base_namespace.instance_of? Module)
+        if (eval(base_namespace.to_s).instance_of? Module)
           code = "module #{base_namespace}\n #{code}\n end\n"
         else
           code = "class #{base_namespace}\n #{code}\n end\n"
@@ -428,7 +415,7 @@ private
             code = "nil;\n " + code
 
             unless no_base_namespace
-              if (base_namespace.instance_of? Module)
+              if (eval(base_namespace.to_s).instance_of? Module)
                 code = "module #{base_namespace}\n #{code}\n end\n"
               else
                 code = "class #{base_namespace}\n #{code}\n end\n"
