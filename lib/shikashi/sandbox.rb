@@ -271,6 +271,9 @@ module Shikashi
     #             be specified as hash parameter
     # :timeout    Optional argument to restrict the execution time of the script to a given value in seconds
     #             (accepts integer and decimal values), when timeout hits Shikashi::Timeout::Error is raised
+    # :base_namespace   Alternate module to contain all classes and constants defined by the unprivileged code
+    #                   if not specified, by default, the base_namespace is created with the sandbox itself
+    # :no_base_namespace  Specify to do not use a base_namespace (default false, not recommended to change)
     #
     #
     #The arguments can be passed in any order and using hash notation or not, examples:
