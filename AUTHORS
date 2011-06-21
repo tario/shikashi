@@ -3,5 +3,6 @@ shikashi de tario <rseminara@hotmail.com>
 
 Thanks to:
 	- Stellard for the contribution with the backstick and percent security bypass test ( test/security/test_system_calls.rb )
+	- Mark Pentland for the performance feedback
 
 
