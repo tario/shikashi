@@ -86,13 +86,13 @@
       <h3 class="section-bar">Methods</h3>
 
       <div class="name-list">
-      <a href="#M000039">get_caller</a>&nbsp;&nbsp;
-      <a href="#M000037">handle_cdecl</a>&nbsp;&nbsp;
-      <a href="#M000036">handle_const</a>&nbsp;&nbsp;
-      <a href="#M000034">handle_gasgn</a>&nbsp;&nbsp;
-      <a href="#M000035">handle_gvar</a>&nbsp;&nbsp;
-      <a href="#M000038">handle_method</a>&nbsp;&nbsp;
-      <a href="#M000033">handle_xstr</a>&nbsp;&nbsp;
+      <a href="#M000040">get_caller</a>&nbsp;&nbsp;
+      <a href="#M000038">handle_cdecl</a>&nbsp;&nbsp;
+      <a href="#M000037">handle_const</a>&nbsp;&nbsp;
+      <a href="#M000035">handle_gasgn</a>&nbsp;&nbsp;
+      <a href="#M000036">handle_gvar</a>&nbsp;&nbsp;
+      <a href="#M000039">handle_method</a>&nbsp;&nbsp;
+      <a href="#M000034">handle_xstr</a>&nbsp;&nbsp;
       </div>
     </div>
 
@@ -127,21 +127,21 @@
     <div id="methods">
       <h3 class="section-bar">Public Instance methods</h3>
 
-      <div id="method-M000039" class="method-detail">
-        <a name="M000039"></a>
+      <div id="method-M000040" class="method-detail">
+        <a name="M000040"></a>
 
         <div class="method-heading">
-          <a href="#M000039" class="method-signature">
+          <a href="#M000040" class="method-signature">
           <span class="method-name">get_caller</span><span class="method-args">()</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000039-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000039-source">
+            onclick="toggleCode('M000040-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000040-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 224</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 261</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">get_caller</span>
         <span class="ruby-identifier">caller</span>[<span class="ruby-value">2</span>].<span class="ruby-identifier">split</span>(<span class="ruby-value str">&quot;:&quot;</span>).<span class="ruby-identifier">first</span>
       <span class="ruby-keyword kw">end</span>
@@ -150,21 +150,21 @@
         </div>
       </div>
 
-      <div id="method-M000037" class="method-detail">
-        <a name="M000037"></a>
+      <div id="method-M000038" class="method-detail">
+        <a name="M000038"></a>
 
         <div class="method-heading">
-          <a href="#M000037" class="method-signature">
+          <a href="#M000038" class="method-signature">
           <span class="method-name">handle_cdecl</span><span class="method-args">(klass, const_id, value)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000037-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000037-source">
+            onclick="toggleCode('M000038-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000038-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 156</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 193</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_cdecl</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">const_id</span>, <span class="ruby-identifier">value</span>)
         <span class="ruby-identifier">source</span> = <span class="ruby-identifier">get_caller</span>
 
@@ -188,26 +188,27 @@
         </div>
       </div>
 
-      <div id="method-M000036" class="method-detail">
-        <a name="M000036"></a>
+      <div id="method-M000037" class="method-detail">
+        <a name="M000037"></a>
 
         <div class="method-heading">
-          <a href="#M000036" class="method-signature">
+          <a href="#M000037" class="method-signature">
           <span class="method-name">handle_const</span><span class="method-args">(name)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000036-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000036-source">
+            onclick="toggleCode('M000037-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000037-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 142</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 178</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_const</span>(<span class="ruby-identifier">name</span>)
         <span class="ruby-identifier">source</span> = <span class="ruby-identifier">get_caller</span>
         <span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">sandbox</span>.<span class="ruby-identifier">privileges</span>[<span class="ruby-identifier">source</span>]
         <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">privileges</span>
-          <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">sandbox</span>.<span class="ruby-identifier">base_namespace</span>.<span class="ruby-identifier">constants</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">name</span>
+          <span class="ruby-identifier">constants</span> = <span class="ruby-identifier">sandbox</span>.<span class="ruby-identifier">base_namespace</span>.<span class="ruby-identifier">constants</span>
+          <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">constants</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">name</span> <span class="ruby-keyword kw">or</span> <span class="ruby-identifier">constants</span>.<span class="ruby-identifier">include?</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_sym</span>
             <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">privileges</span>.<span class="ruby-identifier">const_read_allowed?</span> <span class="ruby-identifier">name</span>.<span class="ruby-identifier">to_s</span>
               <span class="ruby-identifier">raise</span> <span class="ruby-constant">SecurityError</span>, <span class="ruby-node">&quot;cannot access constant #{name}&quot;</span>
             <span class="ruby-keyword kw">end</span>
@@ -221,21 +222,21 @@
         </div>
       </div>
 
-      <div id="method-M000034" class="method-detail">
-        <a name="M000034"></a>
+      <div id="method-M000035" class="method-detail">
+        <a name="M000035"></a>
 
         <div class="method-heading">
-          <a href="#M000034" class="method-signature">
+          <a href="#M000035" class="method-signature">
           <span class="method-name">handle_gasgn</span><span class="method-args">( global_id, value )</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000034-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000034-source">
+            onclick="toggleCode('M000035-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000035-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 117</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 153</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_gasgn</span>( <span class="ruby-identifier">global_id</span>, <span class="ruby-identifier">value</span> )
         <span class="ruby-identifier">source</span> = <span class="ruby-identifier">get_caller</span>
 
@@ -253,21 +254,21 @@
         </div>
       </div>
 
-      <div id="method-M000035" class="method-detail">
-        <a name="M000035"></a>
+      <div id="method-M000036" class="method-detail">
+        <a name="M000036"></a>
 
         <div class="method-heading">
-          <a href="#M000035" class="method-signature">
+          <a href="#M000036" class="method-signature">
           <span class="method-name">handle_gvar</span><span class="method-args">(global_id)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000035-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000035-source">
+            onclick="toggleCode('M000036-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000036-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 130</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 166</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_gvar</span>(<span class="ruby-identifier">global_id</span>)
         <span class="ruby-identifier">source</span> = <span class="ruby-identifier">get_caller</span>
         <span class="ruby-identifier">privileges</span> = <span class="ruby-identifier">sandbox</span>.<span class="ruby-identifier">privileges</span>[<span class="ruby-identifier">source</span>]
@@ -284,21 +285,21 @@
         </div>
       </div>
 
-      <div id="method-M000038" class="method-detail">
-        <a name="M000038"></a>
+      <div id="method-M000039" class="method-detail">
+        <a name="M000039"></a>
 
         <div class="method-heading">
-          <a href="#M000038" class="method-signature">
+          <a href="#M000039" class="method-signature">
           <span class="method-name">handle_method</span><span class="method-args">(klass, recv, method_name)</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000038-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000038-source">
+            onclick="toggleCode('M000039-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000039-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 175</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 212</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_method</span>(<span class="ruby-identifier">klass</span>, <span class="ruby-identifier">recv</span>, <span class="ruby-identifier">method_name</span>)
         <span class="ruby-identifier">source</span> = <span class="ruby-keyword kw">nil</span>
 
@@ -352,21 +353,21 @@
         </div>
       </div>
 
-      <div id="method-M000033" class="method-detail">
-        <a name="M000033"></a>
+      <div id="method-M000034" class="method-detail">
+        <a name="M000034"></a>
 
         <div class="method-heading">
-          <a href="#M000033" class="method-signature">
+          <a href="#M000034" class="method-signature">
           <span class="method-name">handle_xstr</span><span class="method-args">( str )</span>
           </a>
         </div>
       
         <div class="method-description">
           <p><a class="source-toggle" href="#"
-            onclick="toggleCode('M000033-source');return false;">[Source]</a></p>
-          <div class="method-source-code" id="M000033-source">
+            onclick="toggleCode('M000034-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000034-source">
 <pre>
-<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 104</span>
+<span class="ruby-comment cmt"># File lib/shikashi/sandbox.rb, line 140</span>
       <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">handle_xstr</span>( <span class="ruby-identifier">str</span> )
         <span class="ruby-identifier">source</span> = <span class="ruby-identifier">get_caller</span>
 

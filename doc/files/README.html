@@ -56,7 +56,7 @@
     </tr>
     <tr class="top-aligned-row">
       <td><strong>Last Update:</strong></td>
-      <td>Sat Apr 23 22:30:05 -0300 2011</td>
+      <td>Mon Jun 20 18:06:32 -0300 2011</td>
     </tr>
     </table>
   </div>
@@ -256,9 +256,6 @@ define a class from inside the sandbox and use it from outside
 
         include Shikashi
 
-        module SandboxModule
-        end
-
         class X
                 def foo
                         print &quot;X#foo\n&quot;
@@ -266,22 +263,22 @@ define a class from inside the sandbox and use it from outside
         end
 
         s = Sandbox.new
-        priv = Privileges.new
-        priv.allow_method :print
 
         s.run( &quot;
-          class ::X
+          class X
                 def foo
                         print \&quot;foo defined inside the sandbox\\n\&quot;
                 end
           end
-          &quot;, priv, :base_namespace =&gt; SandboxModule)
+          &quot;, Privileges.allow_method(:print))
 
         x = X.new # X class is not affected by the sandbox (The X Class defined in the sandbox is SandboxModule::X)
         x.foo
 
-        x = SandboxModule::X.new
+        x = s.base_namespace::X.new
         x.foo
+
+        s.run(&quot;X.new.foo&quot;, Privileges.allow_method(:new).allow_method(:foo))
 </pre>
 <h3>Timeout example</h3>
 <pre>
