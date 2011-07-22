@@ -3,6 +3,7 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/rdoctask'
 require 'rake/gempackagetask'
+require "rspec/core/rake_task"
 
 spec = Gem::Specification.new do |s|
   s.name = 'shikashi'
@@ -22,12 +23,9 @@ spec = Gem::Specification.new do |s|
 end
 
 desc 'Run tests'
-task :default => [ :test ]
 
-Rake::TestTask.new('test') do |t|
-  t.libs << 'test'
-  t.pattern = '{test}/**/test_*.rb'
-  t.verbose = true
+RSpec::Core::RakeTask.new("test:units") do |t|
+  t.pattern= 'spec/**/*.rb'
 end
 
 desc 'Generate RDoc'
