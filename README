@@ -24,6 +24,16 @@ OR
 
 sudo gem install shikashi-X.X.X.gem.
 
+=== Troubleshooting
+
+ERROR:  While executing gem ... (Gem::DependencyError)
+    Unable to resolve dependencies: ruby2ruby requires sexp_processor (~> 3.0); ruby_parser requires sexp_processor (~> 3.0)
+
+The version of ruby2ruby and ruby_parser required depends on sexp_processor 3.X but for some reason this version of the gem
+is not automatically installed by gem, you can workaround this issue by installing it before using:
+
+gem install sexp_processor --version '~> 3.2'
+
 == Documentation
 
 Full API documentation can be found on:
