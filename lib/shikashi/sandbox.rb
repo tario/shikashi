@@ -467,7 +467,11 @@ private
               end
             end
 
-            hook_handler.evalhook("# encoding: utf-8\n" + code, binding_, source)
+            if encoding
+              # preend encoding
+              code = "# encoding: #{encoding}\n" + code
+            end
+            hook_handler.evalhook(code, binding_, source)
           end
         rescue ::Timeout::Error
           raise Shikashi::Timeout::Error
