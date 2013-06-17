@@ -21,4 +21,19 @@ describe Sandbox, "Shikashi sandbox" do
     Sandbox.new.run("#        encoding: utf-8\n'кириллица'").should be == 'кириллица'
   end
 
+  it "Should accept UTF-8 encoding via ruby header comments" do
+    Sandbox.new.packet("# encoding: utf-8\n'кириллица'").run.should be == 'кириллица'
+  end
+
+  it "Should accept UTF-8 encoding via sandbox run options" do
+    Sandbox.new.packet("'кириллица'", :encoding => "utf-8").run.should be == 'кириллица'
+  end
+
+  it "Should accept UTF-8 encoding via ruby header comments" do
+    Sandbox.new.packet("# encoding:        utf-8\n'кириллица'").run.should be == 'кириллица'
+  end
+
+  it "Should accept UTF-8 encoding via ruby header comments" do
+    Sandbox.new.packet("#        encoding: utf-8\n'кириллица'").run.should be == 'кириллица'
+  end
 end
