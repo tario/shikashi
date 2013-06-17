@@ -370,7 +370,7 @@ module Shikashi
       base_namespace = args.pick(:base_namespace) do nil end
       no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
       privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
-      encoding = args.pick(:encoding) do nil end
+      encoding = get_source_encoding(code) || args.pick(:encoding) do nil end
 
       hook_handler = nil
 
@@ -485,7 +485,7 @@ private
   end
 
   def get_source_encoding(code)
-    first_line = code.lines.first
+    first_line = code.to_s.lines.first.to_s
     m = first_line.match(/encoding:(.*)$/)
     if m
       m[1]
