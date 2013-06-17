@@ -1,13 +1,12 @@
 require 'rubygems'
 require 'rake'
+require 'rdoc/task'
+require 'rubygems/package_task'
 require 'rake/testtask'
-require 'rake/rdoctask'
-require 'rake/gempackagetask'
-require "rspec/core/rake_task"
 
 spec = Gem::Specification.new do |s|
   s.name = 'shikashi'
-  s.version = '0.5.0'
+  s.version = '0.5.1'
   s.author = 'Dario Seminara'
   s.email = 'robertodarioseminara@gmail.com'
   s.platform = Gem::Platform::RUBY
@@ -22,12 +21,6 @@ spec = Gem::Specification.new do |s|
     [ 'LICENSE', 'AUTHORS', 'CHANGELOG', 'README', 'Rakefile', 'TODO' ]
 end
 
-desc 'Run tests'
-
-RSpec::Core::RakeTask.new("test:units") do |t|
-  t.pattern= 'spec/**/*.rb'
-end
-
 desc 'Generate RDoc'
 Rake::RDocTask.new :rdoc do |rd|
   rd.rdoc_dir = 'doc'
@@ -36,7 +29,7 @@ Rake::RDocTask.new :rdoc do |rd|
 end
 
 desc 'Build Gem'
-Rake::GemPackageTask.new spec do |pkg|
+Gem::PackageTask.new spec do |pkg|
   pkg.need_tar = true
 end
 
