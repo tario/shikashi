@@ -281,7 +281,8 @@ module Shikashi
     # :base_namespace   Alternate module to contain all classes and constants defined by the unprivileged code
     #                   if not specified, by default, the base_namespace is created with the sandbox itself
     # :no_base_namespace  Specify to do not use a base_namespace (default false, not recommended to change)
-    #
+    # :encoding           Specify the encoding of source (example: "utf-8"), the encoding also can be
+    #                     specified on header like a ruby normal source file
     #
     #The arguments can be passed in any order and using hash notation or not, examples:
     #
@@ -343,6 +344,8 @@ module Shikashi
     # :base_namespace   Alternate module to contain all classes and constants defined by the unprivileged code
     #                   if not specified, by default, the base_namespace is created with the sandbox itself
     # :no_base_namespace  Specify to do not use a base_namespace (default false, not recommended to change)
+    # :encoding           Specify the encoding of source (example: "utf-8"), the encoding also can be
+    #                     specified on header like a ruby normal source file
     #
     # NOTE: arguments are the same as for Sandbox#run method, except for timeout and binding which can be
     # used when calling Shikashi::Sandbox::Packet#run
