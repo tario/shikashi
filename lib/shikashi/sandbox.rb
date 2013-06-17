@@ -443,7 +443,7 @@ private
             source = args.pick(:source) do generate_id end
             base_namespace = args.pick(:base_namespace) do nil end
             no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
-            encoding = args.pick(:encoding) do nil end
+            encoding = get_source_encoding(code) || args.pick(:encoding) do nil end
 
             hook_handler = nil
 
@@ -481,7 +481,15 @@ private
 
   end
 
-
+  def get_source_encoding(code)
+    first_line = code.lines.first
+    m = first_line.match(/encoding:(.*)$/)
+    if m
+      m[1]
+    else
+      nil
+    end
+  end
 end
 
 Shikashi.global_binding = binding()
