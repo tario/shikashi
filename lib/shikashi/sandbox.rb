@@ -367,6 +367,7 @@ module Shikashi
       base_namespace = args.pick(:base_namespace) do nil end
       no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
       privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
+      encoding = args.pick(:encoding) do nil end
 
       hook_handler = nil
 
@@ -390,6 +391,10 @@ module Shikashi
         else
           code = "class #{base_namespace}\n #{code}\n end\n"
         end
+      end
+
+      if encoding
+        code = "# encoding: #{encoding}\n" + code
       end
 
       evalhook_packet = @hook_handler.packet(code)
@@ -438,6 +443,7 @@ private
             source = args.pick(:source) do generate_id end
             base_namespace = args.pick(:base_namespace) do nil end
             no_base_namespace = args.pick(:no_base_namespace) do @no_base_namespace end
+            encoding = args.pick(:encoding) do nil end
 
             hook_handler = nil
 
@@ -461,7 +467,7 @@ private
               end
             end
 
-            hook_handler.evalhook(code, binding_, source)
+            hook_handler.evalhook("# encoding: utf-8\n" + code, binding_, source)
           end
         rescue ::Timeout::Error
           raise Shikashi::Timeout::Error
