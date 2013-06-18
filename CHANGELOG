@@ -1,3 +1,7 @@
+0.5.2	Fix release (get_source_encoding)
+
+0.5.1	Fixed read of encoding of source files (encoding optional parameter or encoding header)
+
 0.5.0	Refactored sandbox to keep base namespace on each run  (see base_namespace example on README)
 
 		Code packet feature (see documentation)
