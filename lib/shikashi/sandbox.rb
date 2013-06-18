@@ -482,16 +482,16 @@ private
       end
     end
 
-  end
-
-  def get_source_encoding(code)
-    first_line = code.to_s.lines.first.to_s
-    m = first_line.match(/encoding:(.*)$/)
-    if m
-      m[1]
-    else
-      nil
+    def get_source_encoding(code)
+      first_line = code.to_s.lines.first.to_s
+      m = first_line.match(/encoding:(.*)$/)
+      if m
+        m[1]
+      else
+        nil
+      end
     end
+
   end
 end
 
