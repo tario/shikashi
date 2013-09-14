@@ -6,13 +6,13 @@ require 'rake/testtask'
 
 spec = Gem::Specification.new do |s|
   s.name = 'shikashi'
-  s.version = '0.5.2'
+  s.version = '0.5.3'
   s.author = 'Dario Seminara'
   s.email = 'robertodarioseminara@gmail.com'
   s.platform = Gem::Platform::RUBY
   s.summary = 'shikashi is a ruby sandbox that permits the execution of "unprivileged" scripts by defining the permitted methods and constants the scripts can invoke with a white list logic'
   s.homepage = "http://github.com/tario/shikashi"
-  s.add_dependency "evalhook", ">= 0.5.0"
+  s.add_dependency "evalhook", ">= 0.5.5"
   s.add_dependency "getsource", ">= 0.1.0"
   s.has_rdoc = true
   s.extra_rdoc_files = [ 'README' ]
