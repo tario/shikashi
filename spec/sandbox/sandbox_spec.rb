@@ -312,4 +312,20 @@ describe Sandbox, "Shikashi sandbox" do
 
     sandbox.run("XinsideSandbox").should be == sandbox.base_namespace::XinsideSandbox
   end
+
+  class OutsideX44
+    def method_missing(name)
+      name
+    end
+  end
+  OutsideX44_ins = OutsideX44.new
+
+  it "should allow method_missing handling" do
+    sandbox = Sandbox.new
+    privileges = Privileges.new
+    privileges.allow_const_read("OutsideX44_ins")
+    privileges.instances_of(OutsideX44).allow :method_missing
+
+    sandbox.run("OutsideX44_ins.foo", privileges).should be == :foo
+  end
 end
