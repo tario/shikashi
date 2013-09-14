@@ -217,7 +217,13 @@ module Shikashi
         if method_name
 
           source = self.get_caller
-          dest_source = klass.instance_method(method_name).body.file
+          m = begin
+            klass.instance_method(method_name)
+          rescue
+            method_name = :method_missing
+            klass.instance_method(:method_missing)
+          end
+          dest_source = m.body.file
 
           privileges = nil
           if source != dest_source then
