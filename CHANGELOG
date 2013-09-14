@@ -1,3 +1,5 @@
+0.5.3 Allowing method_missing calls
+
 0.5.2	Fix release (get_source_encoding)
 
 0.5.1	Fixed read of encoding of source files (encoding optional parameter or encoding header)
