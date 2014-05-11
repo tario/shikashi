@@ -87,7 +87,8 @@ module Shikashi
     def initialize
       @privileges = Hash.new
       @chain = Hash.new
-      @hook_handler = EvalhookHandler.new
+      @hook_handler_list = Array.new
+      @hook_handler = instantiate_evalhook_handler
       @hook_handler.sandbox = self
       @base_namespace = create_adhoc_base_namespace
       @hook_handler.base_namespace = @base_namespace
@@ -131,6 +132,11 @@ module Shikashi
         rescue ::Timeout::Error
           raise Shikashi::Timeout::Error
         end
+      end
+
+      # Dispose the objects associated with this code package
+      def dispose
+        @evalhook_packet.dispose
       end
     end
 
@@ -381,7 +387,7 @@ module Shikashi
       hook_handler = nil
 
       if base_namespace
-        hook_handler = EvalhookHandler.new
+        hook_handler = instantiate_evalhook_handler
         hook_handler.base_namespace = base_namespace
         hook_handler.sandbox = self
       else
@@ -411,7 +417,7 @@ module Shikashi
     end
 
     def create_hook_handler(*args)
-      hook_handler = EvalhookHandler.new
+      hook_handler = instantiate_evalhook_handler
       hook_handler.sandbox = self
       @base_namespace = args.pick(:base_namespace) do create_adhoc_base_namespace end
       hook_handler.base_namespace = @base_namespace
@@ -424,8 +430,16 @@ module Shikashi
       hook_handler
     end
 
-
+    def dispose
+      @hook_handler_list.each(&:dispose)
+    end
 private
+
+    def instantiate_evalhook_handler
+      newhookhandler = EvalhookHandler.new
+      @hook_handler_list << newhookhandler
+      newhookhandler
+    end
 
     def create_adhoc_base_namespace
       rnd_module_name = "SandboxBasenamespace#{rand(100000000)}"
@@ -457,7 +471,7 @@ private
             hook_handler = nil
 
             if base_namespace
-              hook_handler = EvalhookHandler.new
+              hook_handler = instantiate_evalhook_handler
               hook_handler.base_namespace = base_namespace
               hook_handler.sandbox = self
             else
