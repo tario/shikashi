@@ -1,3 +1,5 @@
+0.6.0 Added dispose methods to allow freeing resources used by evalhook code
+
 0.5.3 Allowing method_missing calls
 
 0.5.2	Fix release (get_source_encoding)
