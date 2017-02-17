@@ -126,7 +126,7 @@ module Shikashi
         end
 
         begin
-          timeout t do
+          ::Timeout.timeout t do
             @evalhook_packet.run(binding_, @source, 0)
           end
         rescue ::Timeout::Error
@@ -459,7 +459,7 @@ private
         yield
       else
         begin
-          timeout t do
+          ::Timeout.timeout t do
             privileges_ = args.pick(Privileges,:privileges) do Privileges.new end
             code = args.pick(String,:code)
             binding_ = args.pick(Binding,:binding) do Shikashi.global_binding end
